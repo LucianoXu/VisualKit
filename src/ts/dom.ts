@@ -35,15 +35,33 @@ export class SafeHtml {
 export const raw = (s: string): SafeHtml => new SafeHtml(s);
 
 /** A template tag: every value is escaped unless it is SafeHtml; arrays are joined; null,
- *  undefined and false write nothing.
+ *  undefined and false write nothing — except a boolean that is an attribute's whole value, which
+ *  is written `true` or `false`.
  *
- *    el.innerHTML = String(html`<b>${name}</b>${items.map((i) => html`<li>${i}</li>`)}`); */
+ *    el.innerHTML = String(html`<b>${name}</b>${items.map((i) => html`<li>${i}</li>`)}`);
+ *    html`<button aria-expanded="${open}">`       // aria-expanded="false" when closed
+ *    html`${open && html`<div>…</div>`}`          // nothing when closed
+ *    html`<li class="row ${on && "on"}">`         // part of a value: nothing when off */
 export function html(strings: TemplateStringsArray, ...values: unknown[]): SafeHtml {
   const one = (v: unknown): string =>
     v === null || v === undefined || v === false ? "" : v instanceof SafeHtml ? v.value : Array.isArray(v) ? v.map(one).join("") : escapeHtml(String(v));
   let out = strings[0];
-  values.forEach((v, k) => (out += one(v) + strings[k + 1]));
+  values.forEach((v, k) => (out += (typeof v === "boolean" && wholeValue(strings[k], strings[k + 1]) ? String(v) : one(v)) + strings[k + 1]));
   return new SafeHtml(out);
+}
+
+/** Whether a value written between `before` and `after` is the whole value of an attribute:
+ *  `name="${v}"`, `name='${v}'` or `name=${v}` followed by a space or the tag's end.
+ *
+ *  `false` writes nothing so that `${cond && html`…`}` leaves nothing in content; but an
+ *  attribute that states a boolean (aria-expanded, aria-checked, aria-pressed) needs the word,
+ *  and `aria-expanded=""` is neither true nor false, so `[aria-expanded="false"]` never matches.
+ *  Only the whole value is read this way: in `class="row ${on && "on"}"` false still writes
+ *  nothing. */
+function wholeValue(before: string, after: string): boolean {
+  const m = /=\s*(["']?)$/.exec(before);
+  if (!m) return false;
+  return m[1] ? after.startsWith(m[1]) : /^(\s|\/?>)/.test(after);
 }
 
 /** A text box as tall as what is written in it, between its CSS min and max heights. */

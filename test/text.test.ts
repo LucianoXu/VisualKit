@@ -16,6 +16,21 @@ test("html escapes values, joins arrays, writes SafeHtml as it is", () => {
   assert.equal(String(html`<ul>${items.map((i) => html`<li>${i}</li>`)}</ul>${null}${false}${raw("<hr>")}`), "<ul><li>&lt;b&gt;</li><li>ok</li></ul><hr>");
 });
 
+test("html writes a boolean that is an attribute's whole value as true or false", () => {
+  const open = false, on = true;
+  assert.equal(String(html`<button aria-expanded="${open}" aria-pressed='${on}' data-x=${open}>`), `<button aria-expanded="false" aria-pressed='true' data-x=false>`);
+  assert.equal(String(html`<input disabled=${false} />`), "<input disabled=false />");
+});
+
+test("html writes false as nothing in content and inside a longer value", () => {
+  const on = false;
+  assert.equal(String(html`<p>${on}${on && html`<b>`}</p>`), "<p></p>");
+  assert.equal(String(html`<li class="row ${on}">`), `<li class="row ">`);
+  assert.equal(String(html`<li class="${on}row">`), `<li class="row">`);
+  // text that only looks like an attribute, with a value beside it, is content
+  assert.equal(String(html`a=${on}${"b"}`), "a=b");
+});
+
 test("markdown: marks make elements, nothing else does", () => {
   assert.equal(markdown("<script>alert(1)</script>"), "<p>&lt;script&gt;alert(1)&lt;/script&gt;</p>");
   assert.equal(markdown("**b** *i* _j_ `x<y`"), "<p><b>b</b> <i>i</i> <i>j</i> <code>x&lt;y</code></p>");
