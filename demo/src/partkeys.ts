@@ -1,4 +1,4 @@
-// The keys: / the search, 1–3 the modes, t the theme, w a window for what is selected, Esc nothing
+// The keys: / the search, 1–3 the modes, Space plays or pauses the run, t the theme, w a window for what is selected, Esc nothing
 // selected, Alt+← and Alt+→ back and forward. None fires while the reader is typing in a field.
 //
 // A part of the page: demo/src/main.ts makes the parts in order, demo/src/page.ts says what they share.
@@ -19,7 +19,11 @@ export function keysPart(page: Page): KeysPart {
       e.preventDefault();
       page.search.focus();
     } else if (e.key === "1" || e.key === "2" || e.key === "3") page.setMode((["select", "uses", "used"] as const)[Number(e.key) - 1]);
-    else if (e.key === "t") setTheme(themeShown() === "dark" ? "light" : "dark");
+    // on a button, Space presses it
+    else if (e.key === " " && !(e.target as Element).closest?.("button, a, [role=radio], [role=switch]")) {
+      e.preventDefault();
+      page.play();
+    } else if (e.key === "t") setTheme(themeShown() === "dark" ? "light" : "dark");
     else if (e.key === "w" && page.selected) page.openNote(page.selected);
     else if (e.key === "Escape" && page.selected) page.select(null);
   });

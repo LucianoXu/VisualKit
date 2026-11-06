@@ -23,6 +23,7 @@ edges, rounded, so that the content is seen running under and around them.
 | bar          | glass                | top, full width, 48px high    | `--r-2xl` 16px   |
 | side panel   | glass                | left, 268px                   | `--r-2xl` 16px   |
 | drawer       | glass                | right, 400px, slides in       | `--r-3xl` 18px   |
+| player       | glass                | foot, centred between panels  | `--r-2xl` 16px   |
 | window       | solid                | anywhere; the reader's        | `--r-xl` 14px    |
 | popover      | solid, ringed        | under its button              | `--r-xl` 14px    |
 | menu         | solid, ringed        | at the pointer                | `--r-lg` 12px    |
@@ -37,6 +38,11 @@ kit makes them solid because controls under them showed through, most where they
 **What is larger and further from the pointer is rounder**: 4px inline code, 7px fields and small
 buttons, 9–10px toolbar buttons and segmented controls, 12px menus, 14px popovers and windows, 16px
 the bar and side panel, 18px the drawer, a full pill for chips and collapsed windows.
+
+**The foot is the player's.** The side panel and the drawer stop at `--bottom`, leaving a 44px row
+(`--player-h`) under them: the player (`.vk-player`) is centred in it on what the panels leave of the
+content, and slides with the drawer. A legend corner keeps to the side panel's column under it, so
+the two never meet; on a phone, where the player takes the width, the corners rise over it.
 
 **One order of layers** (`--z-*`): content, panels 6, strip 15, bar 20, windows 35, popovers 36,
 menu 38, modal 40, loader 50. A popover open in the bar lifts the bar with it (`:has`).

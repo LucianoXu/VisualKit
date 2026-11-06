@@ -54,7 +54,7 @@
   </div>
 
   <aside id="side" class="vk-side vk-glass" aria-label="The board">
-    <div class="vk-side-head"><span class="vk-side-title">Board</span><span class="vk-muted vk-num" id="side-n"></span></div>
+    <div class="vk-side-head"><span class="vk-side-title">Board</span><span class="vk-muted vk-num" id="side-n"></span><button class="vk-icon" id="side-filter" aria-pressed="false" aria-label="Only what is not fine" title="Only what is not fine"></button></div>
     <div class="vk-side-body" id="side-body"></div>
   </aside>
 
@@ -62,7 +62,10 @@
 
   <div class="vk-windows" id="windows"></div>
 
+  <!-- under the side panel, the player right of it (the kit's .vk-player meets .vk-corner.left so) -->
   <div class="vk-corner left" id="legend"></div>
+
+  <div class="vk-player vk-glass" id="player" aria-label="Replay of the run"></div>
 
   <div id="loader" class="vk-loader">
     <div class="vk-loader-box">

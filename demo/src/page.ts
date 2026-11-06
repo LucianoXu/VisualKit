@@ -12,6 +12,7 @@ import type { WindowsPart } from "./partwindows.ts";
 import type { MenuPart } from "./partmenu.ts";
 import type { LegendPart } from "./partlegend.ts";
 import type { LivePart } from "./partlive.ts";
+import type { PlayerPart } from "./partplayer.ts";
 import type { KeysPart } from "./partkeys.ts";
 
 export type Kind = "definition" | "theorem" | "lemma" | "instance" | "axiom";
@@ -56,11 +57,20 @@ export interface PageState {
   at: number;
   /** the drawer's sections the reader has open, kept across its redraws */
   unfolded: Set<string>;
-  /** how many ticks the live updates have made */
+  /** the run's second on show (partlive.ts): the board as it was then */
   tick: number;
+  /** the playhead, in seconds into the run; whether it moves, and how fast */
+  time: number;
+  playing: boolean;
+  speed: number;
+  /** the side panel shows only what is not fine */
+  filter: boolean;
 }
 
-export interface Page extends PageGiven, PageState, CanvasPart, BarPart, StripPart, SidePart, DrawerPart, WindowsPart, MenuPart, LegendPart, LivePart, KeysPart {}
+/** the run's length, in seconds: a tick each */
+export const TICKS = 180;
+
+export interface Page extends PageGiven, PageState, CanvasPart, BarPart, StripPart, SidePart, DrawerPart, WindowsPart, MenuPart, LegendPart, LivePart, PlayerPart, KeysPart {}
 
 /** What is lit with the selection, by the mode: the item itself, what it uses, or what uses it. */
 export function lit(page: Page): Set<string> {

@@ -100,7 +100,13 @@ frame, after the panels whose room it leaves have moved.
 
 A canvas or chart reads its colours from the tokens as it draws (`token("--accent")`), and draws
 again on `onThemeChange`. It reads `--inset-left` and `--inset-right` on `<html>` (set by `insets()`
-whenever a panel opens or closes) to centre itself on what is still seen.
+whenever a panel opens or closes) to centre itself on what is still seen; the player strip
+(`.vk-player`) is centred on them by CSS alone.
+
+What changes many times a second — a player's clock while it plays — is changed in place, not drawn
+again: `Player.show` sets text and attributes on controls made once, so a press or a drag on them is
+never cut short. A sparkline (`sparkline(values)`) is drawn from numbers only, safe to write with
+`html`, and says nothing itself: write its last value beside it.
 
 ## Comments
 

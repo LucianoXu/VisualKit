@@ -4,7 +4,8 @@
 //
 // A part of the page: demo/src/main.ts makes the parts in order, demo/src/page.ts says what they share.
 
-import { $, Drawer, html, holdPress, icon, keepFocus, markdown, raw, confirm, ask } from "../../src/ts/index.ts";
+import { $, Drawer, html, holdPress, icon, keepFocus, markdown, raw, confirm, ask, sparkline } from "../../src/ts/index.ts";
+import type { SafeHtml } from "../../src/ts/index.ts";
 import { KIND_COLOUR } from "./page.ts";
 import type { Page } from "./page.ts";
 
@@ -12,6 +13,13 @@ export interface DrawerPart {
   drawer: Drawer;
   drawDrawer(): void;
 }
+
+/** a build over this many seconds is slow: the sparkline's dashed line */
+const BUDGET = 7;
+
+/** a number named, over its sparkline (numbers only reach the sparkline's markup) */
+const metric = (name: string, value: string, spark: SafeHtml) =>
+  html`<div class="metric"><div class="metric-h"><span>${name}</span><b>${value}</b></div>${spark}</div>`;
 
 export function drawerPart(page: Page): DrawerPart {
   const el = $("#drawer");
@@ -21,6 +29,7 @@ export function drawerPart(page: Page): DrawerPart {
     const it = page.selected ? page.byId.get(page.selected) : null;
     if (!it) return;
     const usedBy = page.items.filter((o) => o.uses.includes(it.id));
+    const times = page.buildTimes(it.id, 24);
     keepFocus(el, () => {
       el.innerHTML = String(html`
         <div class="vk-drawer-head">
@@ -36,6 +45,7 @@ export function drawerPart(page: Page): DrawerPart {
           <div class="vk-stat" style="--g: var(--grad-cool)"><div class="vk-stat-n">${usedBy.length}</div><div class="vk-stat-l">use it</div></div>
           <div class="vk-stat" style="--g: var(--grad-warm)"><div class="vk-stat-n">${it.name.length}</div><div class="vk-stat-l">letters</div></div>
         </div>
+        ${metric("Build time, the last 24 s", `${times.at(-1)!.toFixed(1)} s`, sparkline(times, { threshold: BUDGET }))}
         <div class="vk-md" style="margin-bottom:12px">${raw(markdown(it.note))}</div>
         <pre class="vk-code"><span class="tk-keyword">theorem</span> <span class="tk-type">${it.name}</span> : <span class="tk-type">Prop</span> := <span class="tk-keyword">by</span>
   <span class="tk-comment">-- ${it.uses.length} steps</span>

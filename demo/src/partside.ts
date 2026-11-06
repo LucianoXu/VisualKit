@@ -1,10 +1,11 @@
 // The side panel: the board as a tree, a folding section per group, a row per thing; the reader's
 // folds kept in this browser. Drawn from the page's state, the keyboard's place kept; drawn again on
-// every live tick, so held while the reader presses in it (holdPress).
+// every live tick, so held while the reader presses in it (holdPress). The filter at its head keeps
+// only what is not fine.
 //
 // A part of the page: demo/src/main.ts makes the parts in order, demo/src/page.ts says what they share.
 
-import { $, html, holdPress, keepFocus } from "../../src/ts/index.ts";
+import { $, html, holdPress, icon, keepFocus } from "../../src/ts/index.ts";
 import { KIND_COLOUR, lit } from "./page.ts";
 import type { Page } from "./page.ts";
 
@@ -16,13 +17,20 @@ export function sidePart(page: Page): SidePart {
   const body = $("#side-body");
   $("#side-n").textContent = String(page.items.length);
   const groups = [...new Set(page.items.map((it) => it.group))];
+  const filter = $("#side-filter");
+  filter.innerHTML = icon("filter", 14);
+  filter.addEventListener("click", () => {
+    page.filter = !page.filter;
+    filter.setAttribute("aria-pressed", String(page.filter));
+    drawSide();
+  });
 
   const drawSide = holdPress(body, () =>
     keepFocus(body, () => {
       const folded = new Set(page.folded.get());
       const on = lit(page);
       body.innerHTML = String(html`${groups.map((g) => {
-        const members = page.items.filter((it) => it.group === g);
+        const members = page.items.filter((it) => it.group === g && (!page.filter || it.status !== "ok"));
         const n = members.filter((it) => on.has(it.id)).length;
         // aria-expanded is the fold's whole state: a boolean as an aria attribute's whole value is
         // written as the word (dom.ts, html), and css/surfaces.css hides the body of a "false" one
