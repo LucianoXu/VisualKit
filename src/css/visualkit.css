@@ -1,0 +1,6 @@
+/* VisualKit: the whole kit in one stylesheet. Import the parts on their own to take less. */
+@import url("./tokens.css");
+@import url("./base.css");
+@import url("./controls.css");
+@import url("./surfaces.css");
+@import url("./content.css");

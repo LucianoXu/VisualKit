@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>VisualKit</title>
+  <link rel="icon" href="data:,">
+  <script>
+    // the theme before the first paint (ts/theme.ts keeps it after; themeHeadScript() writes this)
+    try {
+      var t = localStorage.getItem("visualkit-demo:theme");
+      document.documentElement.dataset.theme = t === "dark" ? "dark" : t === "system" && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    } catch (e) {
+      document.documentElement.dataset.theme = "light";
+    }
+  </script>
+  <link rel="stylesheet" href="./visualkit.css">
+  <link rel="stylesheet" href="./demo.css">
+</head>
+<body class="vk-app">
+  <!-- the ground: what the page is about, drawn in the theme's colours (demo/src/partcanvas.ts) -->
+  <canvas id="canvas"></canvas>
+
+  <header class="vk-topbar vk-glass">
+    <div class="vk-brand">
+      <span class="vk-nav"><button id="nav-back" aria-label="Back" title="Back (Alt ←)" disabled></button><button id="nav-fwd" aria-label="Forward" title="Forward (Alt →)" disabled></button></span>
+      <span class="vk-logo">VisualKit</span>
+      <span class="vk-brand-sub">Demo board</span>
+      <span id="status" class="vk-pill"><span class="vk-dot ok"></span><span>Ready</span></span>
+    </div>
+    <div class="vk-topbar-end">
+      <div class="vk-popwrap">
+        <input id="search" class="vk-search" type="search" placeholder="Search  /" autocomplete="off" spellcheck="false" aria-label="Search">
+        <div id="results" class="vk-results" hidden></div>
+      </div>
+      <div class="vk-popwrap">
+        <button id="share-btn" class="vk-act" aria-haspopup="dialog" title="Share this view"></button>
+        <div id="share-pop" class="vk-popover" role="dialog" aria-label="Share" hidden></div>
+      </div>
+      <div class="vk-popwrap">
+        <button id="eyes-btn" class="vk-act icon" aria-haspopup="dialog" aria-label="View settings" title="View settings"></button>
+        <div id="eyes-pop" class="vk-popover" role="dialog" aria-label="View settings" hidden></div>
+      </div>
+      <button id="activity-btn" class="vk-act icon" aria-label="Activity" title="Activity"><span class="vk-badge">3</span></button>
+    </div>
+    <div class="vk-progress" id="progress"><i></i></div>
+  </header>
+
+  <!-- under the bar: the tabs, and the modes -->
+  <div class="vk-strip">
+    <div id="tabs" class="vk-tabs" role="tablist"></div>
+    <span style="flex:1"></span>
+    <div id="modes" class="vk-seg vk-glass" role="radiogroup" aria-label="Mode"></div>
+  </div>
+
+  <aside id="side" class="vk-side vk-glass" aria-label="The board">
+    <div class="vk-side-head"><span class="vk-side-title">Board</span><span class="vk-muted vk-num" id="side-n"></span></div>
+    <div class="vk-side-body" id="side-body"></div>
+  </aside>
+
+  <aside id="drawer" class="vk-drawer vk-glass" aria-label="Selection" tabindex="-1"></aside>
+
+  <div class="vk-windows" id="windows"></div>
+
+  <div class="vk-corner left" id="legend"></div>
+
+  <div id="loader" class="vk-loader">
+    <div class="vk-loader-box">
+      <span class="vk-logo big">VisualKit</span>
+      <div class="vk-loader-title">Making the page…</div>
+      <div class="vk-progress busy" style="width:160px;margin:0 auto"><i></i></div>
+    </div>
+  </div>
+
+  <script type="module" src="./demo.js"></script>
+</body>
+</html>

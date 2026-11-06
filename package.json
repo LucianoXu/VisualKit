@@ -1,0 +1,45 @@
+{
+  "name": "visualkit",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "The design language and page architecture of VisualProof's viewer, as a framework-free kit: tokens, CSS components, and TypeScript primitives.",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LucianoXu/VisualKit.git"
+  },
+  "homepage": "https://github.com/LucianoXu/VisualKit#readme",
+  "keywords": [
+    "design-system",
+    "css",
+    "typescript",
+    "ui",
+    "no-framework",
+    "dark-mode"
+  ],
+  "exports": {
+    ".": "./src/ts/index.ts",
+    "./css": "./src/css/visualkit.css",
+    "./css/*": "./src/css/*",
+    "./*": "./src/ts/*"
+  },
+  "files": [
+    "src/",
+    "DESIGN.md",
+    "ARCHITECTURE.md"
+  ],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "demo": "node scripts/build.mjs --serve",
+    "typecheck": "tsc --noEmit -p .",
+    "test": "node --test \"test/*.test.ts\""
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.2",
+    "esbuild": "^0.28.2",
+    "typescript": "^5.9.0"
+  }
+}

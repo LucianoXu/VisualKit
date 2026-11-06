@@ -1,0 +1,228 @@
+/* VisualKit controls: buttons, toggles, fields, and the small marks that say a state.
+
+   A control is quiet until it is wanted: a white face on a hairline, its border turning to the
+   accent under the pointer. Colour is kept for what a control records (Approve in green, Comment in
+   blue) and for the one thing that is lit. A control that cannot be used here looks it — faded,
+   never grey on its own colour — and says why in its title. */
+
+/* ---------------------------------------------------------------- buttons */
+
+/* the everyday button: in forms, popovers, modals */
+.vk-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  border: 1px solid var(--line); background: var(--surface-solid); color: var(--text); font: 12px var(--font);
+  padding: 4px 10px; border-radius: var(--r-sm); cursor: pointer; white-space: nowrap; text-decoration: none;
+}
+.vk-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); text-decoration: none; }
+.vk-btn:disabled { color: var(--text-3); cursor: default; }
+.vk-btn svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+/* solid: the one action a box is for. White text on a colour a shade deeper than its token */
+.vk-btn.primary, .vk-btn.ok, .vk-btn.info { color: white; font-weight: 500; border-color: transparent; }
+.vk-btn.primary { background: var(--accent); }
+.vk-btn.ok { background: var(--ok-btn); }
+.vk-btn.info { background: var(--info-btn); }
+.vk-btn:is(.primary, .ok, .info):hover:not(:disabled) { color: white; border-color: transparent; filter: brightness(1.08); }
+.vk-btn:is(.primary, .ok, .info):active:not(:disabled) { filter: brightness(0.92); }
+.vk-btn:is(.primary, .ok, .info):disabled { color: white; opacity: 0.45; }
+.vk-btn.ok:focus-visible { outline-color: var(--ok-btn); outline-offset: 2px; }
+.vk-btn.info:focus-visible { outline-color: var(--info-btn); outline-offset: 2px; }
+/* what removes or revokes: red text on the quiet face */
+.vk-btn.bad { color: var(--bad); border-color: color-mix(in srgb, var(--bad) 45%, transparent); }
+.vk-btn.bad:hover:not(:disabled) { border-color: var(--bad); color: var(--bad); background: color-mix(in srgb, var(--bad) 8%, var(--surface-solid)); }
+/* an outlined accent button, for a secondary action that should still be found */
+.vk-btn.soft { color: var(--accent); font-weight: 600; background: none; border-color: color-mix(in srgb, var(--accent) 40%, transparent); }
+.vk-btn.soft:hover:not(:disabled) { background: color-mix(in srgb, var(--accent) 10%, transparent); }
+.vk-btn.small { padding: 3px 8px; font-size: var(--fs-sm); }
+
+/* the toolbar's button: taller, an icon and a word; an icon alone is square */
+.vk-act {
+  position: relative; display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 10px; border-radius: var(--r-md);
+  border: 1px solid var(--line); background: var(--surface-solid); color: var(--text); font: var(--fs-ctl) var(--font); cursor: pointer;
+}
+.vk-act svg { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.vk-act:hover, .vk-act.on, .vk-act[aria-expanded="true"] { border-color: var(--accent); }
+.vk-act.icon { width: 32px; padding: 0; justify-content: center; }
+/* a count on its corner */
+.vk-act .vk-badge { position: absolute; top: -6px; right: -7px; box-shadow: 0 0 0 2px var(--surface-solid); }
+
+/* a ghost icon button: in a window's title bar, beside a heading */
+.vk-icon {
+  display: inline-grid; place-items: center; flex: none; padding: 0; border: 0; background: transparent; color: var(--text-2);
+  width: 26px; height: 26px; border-radius: var(--r-sm); cursor: pointer; font-size: 14px;
+}
+.vk-icon:hover { background: var(--code-bg); color: var(--text); }
+.vk-icon svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+/* round, on a tint: a panel's close */
+.vk-icon.round { border-radius: 50%; background: var(--code-bg); }
+
+/* a link that is a button */
+.vk-link { border: 0; background: none; padding: 0; color: var(--accent); font-weight: 500; font-size: 12px; cursor: pointer; }
+.vk-link:hover { text-decoration: underline; }
+
+/* back and forward: a pill of two chevrons on a tint, the one under the pointer raised */
+.vk-nav {
+  display: inline-flex; gap: 2px; align-self: center; flex: none; padding: 2px;
+  background: var(--code-bg); border: 0.5px solid var(--line); border-radius: 10px;
+}
+.vk-nav button {
+  display: grid; place-items: center; width: 32px; height: 28px; padding: 0; border: 0;
+  border-radius: 8px; background: transparent; color: var(--text); cursor: pointer;
+  transition: background var(--dur-fast), color var(--dur-fast), box-shadow var(--dur-fast);
+}
+.vk-nav svg { fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.vk-nav button:hover:not(:disabled) { background: var(--surface-solid); color: var(--accent); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12); }
+.vk-nav button:active:not(:disabled) { transform: translateY(0.5px); }
+.vk-nav button:disabled { color: var(--text-3); opacity: 0.45; cursor: default; }
+
+/* ---------------------------------------------------------------- choosing one of a few */
+
+/* segmented: a tint for a track, the chosen one a raised white face */
+.vk-seg { display: inline-flex; background: var(--code-bg); border-radius: 10px; padding: 2px; }
+.vk-seg button {
+  border: 0; background: transparent; padding: 5px 13px; border-radius: 8px;
+  font-weight: 500; color: var(--text-2); white-space: nowrap; transition: background var(--dur-fast), color var(--dur-fast);
+  display: inline-flex; align-items: center; justify-content: center; gap: 5px;
+}
+.vk-seg button:hover { color: var(--text); }
+.vk-seg button:is(.on, [aria-selected="true"], [aria-checked="true"]) { background: var(--surface-solid); color: var(--text); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12); }
+.vk-seg svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.vk-seg.small button { padding: 4px 10px; font-size: 12px; }
+.vk-seg.mini { padding: 2px; border-radius: 8px; }
+.vk-seg.mini button { padding: 2px 8px; border-radius: 6px; font-size: var(--fs-sm); }
+/* full width, its choices sharing it: tabs inside a popover */
+.vk-seg.fill { display: flex; }
+.vk-seg.fill button { flex: 1; }
+
+/* tabs over the content: glass lozenges, the open one solid and ringed in the accent */
+.vk-tabs { display: flex; align-items: center; gap: 4px; min-width: 0; overflow-x: auto; scrollbar-width: none; padding: 2px; }
+.vk-tabs::-webkit-scrollbar { display: none; }
+.vk-tab {
+  flex: none; display: inline-flex; align-items: center; gap: 6px; height: 30px; max-width: 240px; padding: 0 12px;
+  border-radius: 10px; border: 0.5px solid var(--line); background: var(--surface); color: var(--text-2);
+  backdrop-filter: saturate(180%) blur(22px); -webkit-backdrop-filter: saturate(180%) blur(22px);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06); font: 500 var(--fs-ctl) var(--font); white-space: nowrap; cursor: pointer;
+  transition: background var(--dur-fast), color var(--dur-fast), box-shadow var(--dur-fast);
+}
+.vk-tab:hover { color: var(--text); }
+.vk-tab:is(.on, [aria-selected="true"]) { background: var(--surface-solid); color: var(--text); box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--accent) 55%, transparent), var(--shadow); }
+.vk-tab:has(.vk-tab-x) { padding-right: 6px; }
+.vk-tab-t { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.vk-tab-x { display: grid; place-items: center; width: 18px; height: 18px; border-radius: 6px; color: var(--text-3); font-size: 14px; line-height: 1; }
+.vk-tab-x:hover { background: var(--code-bg); color: var(--text); }
+
+/* a switch: on in the accent */
+.vk-switch {
+  display: inline-flex; align-items: center; gap: 8px; padding: 2px 0; border: 0;
+  background: none; color: var(--text); font: 600 var(--fs-ctl) var(--font); cursor: pointer;
+}
+.vk-switch > i { position: relative; flex: none; width: 28px; height: 16px; border-radius: 8px; background: color-mix(in srgb, var(--text-3) 60%, transparent); transition: background var(--dur-fast); }
+.vk-switch > i::after {
+  content: ""; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 50%;
+  background: var(--surface-solid); box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); transition: transform var(--dur-fast);
+}
+.vk-switch[aria-checked="true"] > i { background: var(--accent); }
+.vk-switch[aria-checked="true"] > i::after { transform: translateX(12px); }
+.vk-switch:focus-visible { outline: none; }
+.vk-switch:focus-visible > i { box-shadow: 0 0 0 2px var(--surface-solid), 0 0 0 4px var(--accent); }
+
+/* a radio drawn as a ring, in menus and popovers */
+.vk-radio { position: relative; padding-left: 30px; }
+.vk-radio::before {
+  content: ""; position: absolute; left: 10px; top: 50%; width: 12px; height: 12px; margin-top: -6px; border-radius: 50%;
+  box-shadow: inset 0 0 0 1.5px var(--text-3);
+}
+.vk-radio[aria-checked="true"]::before { box-shadow: inset 0 0 0 1.5px var(--accent), inset 0 0 0 4px var(--surface-solid); background: var(--accent); }
+
+/* ---------------------------------------------------------------- fields */
+
+.vk-input, .vk-select, .vk-textarea {
+  font: var(--fs-ctl) var(--font); color: var(--text); background: var(--surface-solid);
+  border: 1px solid var(--line); border-radius: var(--r-sm); padding: 5px 8px;
+}
+.vk-input:focus, .vk-select:focus, .vk-textarea:focus { outline: 2px solid color-mix(in srgb, var(--accent) 45%, transparent); outline-offset: 0; }
+.vk-input.mono, .vk-textarea.mono { font: var(--fs-sm) var(--mono); }
+/* a text box wraps, never scrolls sideways, and grows as one writes (ts/dom.ts, fitBox) */
+.vk-textarea {
+  display: block; width: 100%; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; resize: vertical;
+  overflow-x: hidden; overflow-y: auto; min-height: calc(3 * 1.45em + 12px); max-height: calc(18 * 1.45em + 12px);
+}
+/* the search: a tint until focused, then white with a soft ring */
+.vk-search {
+  width: 220px; height: 32px; border-radius: var(--r-md); border: 0.5px solid var(--line);
+  background: var(--code-bg); color: var(--text); padding: 0 12px; font: inherit; outline: none;
+}
+.vk-search:focus { background: var(--surface-solid); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); }
+/* a form: labels in a column of their own, fields beside them */
+.vk-form { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 10px; align-items: center; font-size: var(--fs-ctl); }
+.vk-form > label { color: var(--text-2); }
+/* a field above its label's line, in a grid of settings */
+.vk-field { display: flex; flex-direction: column; gap: 3px; font-size: var(--fs-sm); color: var(--text-2); }
+.vk-field > :is(input, select, textarea) { font: var(--fs-ctl) var(--font); color: var(--text); background: var(--surface-solid); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 5px 7px; }
+.vk-hint { font-size: var(--fs-sm); line-height: 1.4; color: var(--text-3); }
+
+/* a field under 16 px makes iOS zoom the whole page into it */
+@media (max-width: 700px) {
+  .vk-input, .vk-select, .vk-textarea, .vk-search, .vk-field > :is(input, select, textarea) { font-size: 16px; }
+}
+
+/* ---------------------------------------------------------------- marks of state */
+
+/* a count: red, on a toolbar button's corner or in a list */
+.vk-badge {
+  display: inline-block; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--bad); color: #fff;
+  font: 600 10.5px/18px var(--font); text-align: center;
+}
+.vk-badge.quiet { background: var(--code-bg); color: var(--text-2); box-shadow: inset 0 0 0 1px var(--line); }
+.vk-badge.accent { background: var(--accent); }
+
+/* a chip: a word on a tint */
+.vk-chip {
+  display: inline-block; padding: 1px 8px; border-radius: var(--r-pill); background: var(--code-bg);
+  font-size: var(--fs-xs); color: var(--text-2);
+}
+.vk-chip.accent { color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); font-weight: 600; }
+.vk-chip.warn { color: var(--banner-warn); background: rgba(255, 159, 10, 0.14); }
+.vk-chip.bad { color: var(--banner-bad); background: rgba(255, 55, 95, 0.14); font-weight: 600; }
+.vk-chip.ok { color: color-mix(in srgb, var(--ok) 70%, var(--text)); background: color-mix(in srgb, var(--ok) 14%, transparent); }
+
+/* a dot of state; running pulses */
+.vk-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; flex: none; background: var(--st-idle); }
+.vk-dot.ok { background: var(--st-ok); }
+.vk-dot.running { background: var(--st-running); animation: vk-pulse 1.1s ease-in-out infinite; }
+.vk-dot.attention { background: var(--st-attention); }
+.vk-dot.failed { background: var(--st-failed); }
+/* hollow: waiting, or blocked */
+.vk-dot.hollow { background: transparent; box-shadow: inset 0 0 0 1.5px var(--st-idle); }
+.vk-dot.hollow.failed { box-shadow: inset 0 0 0 1.5px var(--st-failed); }
+
+/* a status pill: a dot and a few words, in the bar */
+.vk-pill {
+  display: inline-flex; align-items: center; gap: 6px; border: 0; border-radius: var(--r-pill);
+  padding: 3px 10px; font-size: var(--fs-sm); font-weight: 600; white-space: nowrap; max-width: 340px; overflow: hidden; text-overflow: ellipsis;
+  background: var(--code-bg); color: var(--text-2);
+}
+.vk-pill.bad { color: var(--st-failed); background: rgba(255, 59, 48, 0.1); }
+.vk-pill.accent { color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); }
+
+/* a banner: a sentence on a tint of its colour */
+.vk-banner { border-radius: 10px; padding: 8px 10px; font-size: 12px; line-height: 1.4; }
+.vk-banner.bad { background: rgba(255, 59, 48, 0.1); color: var(--banner-bad); }
+.vk-banner.warn { background: rgba(255, 159, 10, 0.13); color: var(--banner-warn); }
+.vk-banner.info { background: rgba(10, 132, 255, 0.1); color: var(--banner-info); }
+.vk-banner.accent { background: color-mix(in srgb, var(--accent) 10%, transparent); color: var(--text); }
+.vk-banner code { font: var(--fs-xs) var(--mono); }
+
+/* someone: initials on their colour; an agent's corners squarer */
+.vk-avatar {
+  display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; color: #fff;
+  font: 600 var(--fs-sm) var(--font); flex: none; background: var(--c, var(--accent));
+}
+.vk-avatar.agent { border-radius: 6px; }
+.vk-avatar.small { width: 20px; height: 20px; font-size: 9px; }
+
+/* progress: a thin bar in the gradient, or a bar of parts in their colours */
+.vk-progress { height: 2px; border-radius: 2px; background: transparent; overflow: hidden; }
+.vk-progress > i { display: block; height: 100%; width: 0; background: var(--grad); border-radius: 2px; transition: width 0.4s; }
+.vk-progress.busy > i { width: 40%; animation: vk-slide 1.1s ease-in-out infinite; }
+.vk-meter { display: flex; height: 5px; border-radius: 3px; overflow: hidden; background: var(--line); min-width: 40px; }
+.vk-meter > i { display: block; height: 100%; background: var(--c, var(--accent)); }

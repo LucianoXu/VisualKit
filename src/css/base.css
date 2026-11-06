@@ -1,0 +1,62 @@
+/* VisualKit base: the page's ground and the rules every element follows. */
+
+/* `hidden` hides, whatever display a class gives the element */
+[hidden] { display: none !important; }
+
+/* Reduced motion (the system's setting; ts/theme.ts, reducedMotion, for what moves by script):
+   nothing slides, fades, pulses or spins — what changes is there at once. Every transition and
+   animation is over within a millisecond rather than removed, so that code waiting for one to end
+   still hears it. Where an animation says something (a flash showing where a line is), give it a
+   still form of its own (.vk-flash below). */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0s !important; transition-delay: 0s !important;
+    animation-duration: 1ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--canvas);
+  color: var(--text);
+  font: var(--fs-body)/1.45 var(--font);
+  -webkit-font-smoothing: antialiased;
+}
+/* an app shell: the page is the screen, and its panels scroll inside it */
+body.vk-app, html:has(body.vk-app) { height: 100%; overflow: hidden; }
+
+button { font: inherit; color: inherit; cursor: pointer; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code { font: 0.92em var(--mono); background: var(--code-bg); padding: 0 3px; border-radius: var(--r-xs); }
+kbd {
+  font: var(--fs-xs) var(--mono); color: var(--text); padding: 1px 6px; border-radius: 5px; border: 1px solid var(--line);
+  border-bottom-width: 2px; background: var(--surface-solid); white-space: nowrap;
+}
+mark { background: color-mix(in srgb, var(--accent) 24%, transparent); color: inherit; border-radius: 3px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+/* text helpers */
+.vk-muted { color: var(--text-3); font-weight: 400; }
+.vk-soft { color: var(--text-2); }
+.vk-mono { font-family: var(--mono); }
+.vk-num { font-variant-numeric: tabular-nums; }
+/* a small heading over a group: spaced capitals in the second text colour */
+.vk-overline { margin: 0 0 8px; font-size: var(--fs-xs); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-2); }
+
+/* syntax colours (a highlighter's classes) */
+.tk-keyword { color: var(--tk-keyword); font-weight: 600; }
+.tk-type { color: var(--tk-type); }
+.tk-comment { color: var(--tk-comment); font-style: italic; }
+.tk-string { color: var(--tk-string); }
+.tk-number { color: var(--tk-number); }
+.tk-attr { color: var(--tk-attr); }
+
+/* a place gone to: flashed in the accent, then as it was; still, under reduced motion, for a while */
+@keyframes vk-flash { from { background-color: color-mix(in srgb, var(--accent) 24%, transparent); } to { background-color: transparent; } }
+.vk-flash { animation: vk-flash 2.4s ease-out; border-radius: 6px; }
+@media (prefers-reduced-motion: reduce) { .vk-flash { animation-duration: 4s !important; animation-timing-function: steps(1, end); } }
+@keyframes vk-pulse { 50% { opacity: 0.3; } }
+@keyframes vk-slide { from { transform: translateX(-100%); } to { transform: translateX(250%); } }

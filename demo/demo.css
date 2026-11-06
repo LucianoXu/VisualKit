@@ -1,0 +1,22 @@
+/* The demo's own styles: only what is the demo's, not the kit's. */
+
+#canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; cursor: default; touch-action: none; }
+/* under the strip of tabs: the panels start lower (the kit reads --panel-top) */
+:root { --panel-top: var(--top-tabs); }
+#legend { --corner-left: calc(var(--side-w) + 8px); }
+@media (max-width: 700px) { #legend { --corner-left: 0px; } }
+
+/* the board's tree in the side panel */
+.tree-h { margin: 10px 0 4px; }
+.tree .vk-row { padding-left: 4px; }
+.tree .vk-row i { width: 9px; height: 9px; border-radius: 50%; flex: none; background: var(--c); }
+
+/* the strip's modes sit on glass */
+#modes { padding: 2px; border-radius: 11px; }
+
+/* a note window's body */
+.note-body { display: flex; flex-direction: column; gap: 8px; }
+.inspector { display: flex; flex-direction: column; gap: 6px; font-size: 12px; min-width: 220px; }
+
+/* on a phone the drawer's sheet says what the inspector says: the inspector stays away */
+@media (max-width: 700px) { .inspector-win { display: none; } }

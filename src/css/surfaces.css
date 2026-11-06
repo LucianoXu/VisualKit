@@ -1,0 +1,304 @@
+/* VisualKit surfaces: what floats over the content, and in which order.
+
+   The page is a ground (the content: a canvas, a document) with everything else floating over it,
+   a margin (--edge) from the viewport's edges, rounded, on glass or on a solid surface:
+
+     the bar          glass, the full width at the top              --z-bar
+     the side panel   glass, at the left                            --z-panel
+     the drawer       glass, slides in from the right               --z-panel
+     windows          solid, moved and resized by the reader        --z-windows
+     popovers         solid, ringed, from a button                  --z-popover
+     the menu         solid, ringed, at the pointer                 --z-menu
+     modals           glass, over a shade                           --z-modal
+     the loader       the ground itself, until the page is ready    --z-loader
+
+   Glass is for what stays (the bar, the panels): the content shows through, blurred. What is read
+   closely or opened for a moment (a popover, a menu, search results) is solid, ringed by a hairline
+   and lifted by the large shadow: VisualProof's 94–96% let the words of controls under it show
+   through its own, most where they lie on glass. */
+
+.vk-glass {
+  background: var(--surface);
+  backdrop-filter: saturate(180%) blur(22px);
+  -webkit-backdrop-filter: saturate(180%) blur(22px);
+  border: 0.5px solid var(--line);
+  box-shadow: var(--shadow);
+}
+/* solid, ringed rather than bordered */
+.vk-solid {
+  background: var(--surface-solid);
+  box-shadow: 0 0 0 1px var(--line), var(--shadow-lg);
+}
+
+/* ---------------------------------------------------------------- the brand */
+
+/* the logo and the name of what is selected: the gradient, clipped to the text */
+.vk-logo, .vk-grad-text {
+  background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.vk-logo { font-weight: 700; letter-spacing: -0.02em; font-size: 17px; }
+.vk-logo.big { font-size: 40px; display: inline-block; }
+.vk-title {
+  margin: 8px 0 2px; font-size: var(--fs-h1); line-height: 1.15; letter-spacing: -0.025em; font-weight: 700;
+  background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; word-break: break-word;
+}
+
+/* ---------------------------------------------------------------- the bar */
+
+.vk-topbar {
+  position: fixed; top: var(--edge); left: var(--edge); right: var(--edge); z-index: var(--z-bar);
+  display: flex; align-items: center; gap: 14px;
+  height: var(--bar-h); padding: 0 10px 0 16px; border-radius: var(--r-2xl);
+}
+/* a popover open in the bar lifts the bar over the windows with it */
+.vk-topbar:has(.vk-popover:not([hidden])) { z-index: var(--z-popover); }
+.vk-brand { display: flex; align-items: baseline; gap: 10px; min-width: 0; flex: 1; }
+.vk-brand .vk-nav { align-self: center; }
+/* what is open, after the logo: a second voice that gives way first */
+.vk-brand-sub { color: var(--text-2); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vk-topbar-end { display: flex; align-items: center; gap: 10px; flex: 1; justify-content: flex-end; }
+/* the bar's progress, a gradient line along its foot */
+.vk-topbar > .vk-progress { position: absolute; left: 16px; right: 16px; bottom: 0; }
+
+/* a strip under the bar: the tabs, at the left; what lights up, at the right */
+.vk-strip {
+  position: fixed; top: calc(var(--edge) + var(--bar-h) + 6px); left: var(--edge); right: var(--edge); height: 34px; z-index: 17;
+  display: flex; align-items: center; gap: 8px; pointer-events: none;
+}
+.vk-strip > * { pointer-events: auto; }
+
+/* ---------------------------------------------------------------- panels */
+
+/* the side panel: what the content holds (a tree, a list), at the left */
+.vk-side {
+  position: fixed; top: var(--panel-top, var(--top)); left: var(--edge); bottom: var(--bottom); width: var(--side-w);
+  border-radius: var(--r-2xl); z-index: var(--z-panel); display: flex; flex-direction: column; overflow: hidden;
+}
+.vk-side-head { display: flex; align-items: center; gap: 4px; padding: 8px 10px 6px 14px; flex: none; }
+.vk-side-title { flex: 1; min-width: 0; font: 600 var(--fs-ctl) var(--font); }
+.vk-side-body { flex: 1; min-height: 0; overflow: auto; padding: 4px 8px 12px 14px; }
+
+/* the drawer: what is selected, told in full, slid in from the right (ts/drawer.ts) */
+.vk-drawer {
+  position: fixed; top: var(--panel-top, var(--top)); right: var(--edge); bottom: var(--bottom); width: var(--drawer-w);
+  border-radius: var(--r-3xl); z-index: var(--z-panel); overflow: auto; padding: 18px 20px 24px;
+  transform: translateX(calc(100% + 24px)); transition: transform var(--dur-panel) var(--ease-out);
+}
+.vk-drawer.open { transform: none; }
+.vk-drawer-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 10px; }
+.vk-drawer-kicker { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; color: var(--text-2); font-size: 12px; font-weight: 500; }
+.vk-drawer-title { font-weight: 700; font-size: var(--fs-h2); letter-spacing: -0.01em; }
+
+/* a section that folds: a heading with a chevron, what is worth seeing folded at its right */
+.vk-sec { border-top: 1px solid var(--line); padding: 7px 0 3px; }
+.vk-sec-h {
+  display: flex; align-items: center; gap: 6px; width: 100%; padding: 2px 0; border: 0; background: transparent;
+  color: var(--text); font: 600 var(--fs-ctl) var(--font); text-align: left; cursor: pointer;
+}
+/* the chevron: a small triangle drawn in the text's colour, centred on the line (a glyph sits high) */
+.vk-sec-h::before {
+  content: ""; flex: none; width: 6px; height: 8px; margin: 0 2px; background: var(--text-3);
+  clip-path: polygon(0 0, 100% 50%, 0 100%); transition: transform var(--dur-fast);
+}
+.vk-sec-h[aria-expanded="true"]::before { transform: rotate(90deg); }
+.vk-sec-h:hover { color: var(--accent); }
+.vk-sec-h:hover::before { background: var(--accent); }
+.vk-sec-aside { flex: 1; min-width: 0; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 400; font-size: var(--fs-sm); color: var(--text-3); }
+.vk-sec-body { padding-top: 6px; }
+.vk-sec-h[aria-expanded="false"] + .vk-sec-body { display: none; }
+
+/* ---------------------------------------------------------------- popovers, menus, results */
+
+/* a popover: from a button, near-solid; goes on a press elsewhere, Esc, or the button (ts/popover.ts) */
+.vk-popwrap { position: relative; }
+.vk-popover {
+  position: absolute; top: calc(100% + 8px); right: 0; z-index: var(--z-popover);
+  width: min(360px, calc(100vw - 24px)); max-height: calc(100vh - 70px); overflow: auto;
+  padding: 10px 12px 12px; border-radius: var(--r-xl);
+  display: flex; flex-direction: column; gap: 10px;
+  background: var(--surface-solid); box-shadow: 0 0 0 1px var(--line), var(--shadow-lg);
+}
+.vk-popover.left { right: auto; left: 0; }
+/* placed by script (ts/popover.ts, beside) rather than under its button */
+.vk-popover.fixed { position: fixed; top: auto; right: auto; }
+.vk-pop-h { font-weight: 600; }
+.vk-pop-sep { height: 1px; margin: 0 -12px; background: var(--line); }
+
+/* search results under the search box: denser than glass, read closely */
+.vk-results {
+  position: absolute; right: 0; top: 40px; z-index: var(--z-popover);
+  width: min(500px, calc(100vw - 24px)); max-height: min(560px, calc(100vh - 80px)); overflow: auto;
+  border-radius: var(--r-lg); padding: 4px;
+  background: var(--surface-solid); box-shadow: 0 0 0 1px var(--line), var(--shadow-lg);
+}
+
+/* the menu: at the pointer, over everything but modals (ts/menu.ts) */
+.vk-menu, .vk-menu-sub {
+  padding: 4px; border-radius: var(--r-lg); font-size: var(--fs-ctl); outline: none;
+  background: var(--surface-solid); box-shadow: 0 0 0 1px var(--line), var(--shadow-lg);
+}
+.vk-menu { position: fixed; z-index: var(--z-menu); min-width: 210px; max-width: min(320px, calc(100vw - 16px)); -webkit-user-select: none; user-select: none; }
+.vk-menu-sub { position: absolute; min-width: 190px; max-width: 300px; max-height: calc(100vh - 16px); overflow: auto; }
+.vk-menu-h { padding: 4px 8px 5px; font-size: var(--fs-xs); font-weight: 600; color: var(--text-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vk-menu-item {
+  display: flex; align-items: center; gap: 12px; width: 100%; height: 28px; padding: 0 8px; border: 0; border-radius: var(--r-sm);
+  background: transparent; color: var(--text); font: var(--fs-ctl) var(--font); text-align: left; cursor: pointer;
+}
+.vk-menu-item:is(:hover, :focus-visible, :focus, [aria-expanded="true"]):not(:disabled) { background: var(--code-bg); color: var(--accent); outline: none; }
+.vk-menu-item:disabled { color: var(--text-3); cursor: default; }
+.vk-menu-item.bad { color: var(--bad); }
+.vk-menu-l { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vk-menu-key { font: 10.5px var(--mono); color: var(--text-3); }
+.vk-menu-note { font-size: var(--fs-xs); color: var(--text-3); }
+.vk-menu-more { color: var(--text-3); font-size: 10px; }
+.vk-menu-sep { height: 1px; margin: 3px 6px; background: var(--line); }
+@media (pointer: coarse) { .vk-menu-key { display: none; } .vk-menu-item { height: 36px; } }
+
+/* a tooltip: one line, under the pointer or a button */
+.vk-tip {
+  position: fixed; left: 0; top: 0; z-index: var(--z-menu); pointer-events: none; display: flex; align-items: center; gap: 6px;
+  background: var(--surface-solid); border-radius: 8px; padding: 4px 9px; box-shadow: var(--shadow);
+  font: var(--fs-sm) var(--font); max-width: 520px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.vk-tip.mono { font-family: var(--mono); }
+/* a richer hint under a button: a bold name, a key, a sentence (ts/hint.ts) */
+.vk-hintcard {
+  position: fixed; z-index: var(--z-menu); pointer-events: none; width: max-content; max-width: 300px;
+  padding: 8px 10px; border-radius: 10px; font-size: 12px; line-height: 1.45;
+  background: var(--surface-solid); box-shadow: 0 0 0 1px var(--line), var(--shadow);
+}
+.vk-hintcard b { font-weight: 600; }
+.vk-hintcard .vk-muted { font-size: var(--fs-sm); }
+
+/* ---------------------------------------------------------------- modals */
+
+.vk-modal {
+  position: fixed; inset: 0; z-index: var(--z-modal); display: flex; align-items: center; justify-content: center;
+  background: rgba(0, 0, 0, 0.22);
+}
+.vk-modal-box {
+  width: min(380px, calc(100vw - 32px)); max-height: calc(100vh - 64px); overflow: auto;
+  padding: 18px 18px 14px; border-radius: var(--r-xl); display: flex; flex-direction: column; gap: 10px;
+}
+.vk-modal-box.wide { width: min(520px, calc(100vw - 32px)); }
+.vk-modal-title { font-weight: 600; font-size: var(--fs-h3); }
+.vk-modal-text { color: var(--text-2); font-size: var(--fs-ctl); line-height: 1.45; }
+.vk-modal-err { color: var(--banner-bad); font-size: var(--fs-ctl); line-height: 1.4; }
+.vk-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; }
+
+/* ---------------------------------------------------------------- floating windows */
+
+/* their layer over the page (ts/floatwin.ts): the one pressed or focused last in front */
+.vk-windows { position: fixed; inset: 0; z-index: var(--z-windows); pointer-events: none; }
+.vk-windows > * { pointer-events: auto; }
+.vk-win {
+  position: fixed; display: flex; flex-direction: column; border-radius: var(--r-xl); background: var(--surface-solid);
+  box-shadow: 0 0 0 1px var(--line), var(--shadow-lg);
+}
+.vk-win:focus { outline: none; }
+.vk-win:is(.moving, .sizing) { user-select: none; -webkit-user-select: none; }
+/* clipped, never scrolled: a control the browser reveals must not shift the content */
+.vk-win-box { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; border-radius: inherit; overflow: clip; }
+/* its title bar: dragged to move it, double-clicked to collapse it */
+.vk-win-head {
+  display: flex; align-items: center; gap: 10px; padding: 6px 8px 6px 12px; border-bottom: 1px solid var(--line); flex: none;
+  cursor: grab; user-select: none; -webkit-user-select: none; touch-action: none;
+}
+.vk-win.moving .vk-win-head { cursor: grabbing; }
+/* a narrow window shortens its subtitle, then its name, never its buttons */
+.vk-win-title { font: 600 var(--fs-h3) var(--font); flex: 0 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vk-win-sub { color: var(--text-2); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; flex-shrink: 1000; }
+.vk-win-acts { display: inline-flex; align-items: center; gap: 2px; flex: none; margin-left: auto; }
+.vk-win-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 12px 16px; }
+/* pinned: a line of the accent over its title bar */
+.vk-win.pinned .vk-win-head { box-shadow: inset 0 2px 0 var(--accent); }
+/* collapsed: a pill with its name; a click opens it again */
+.vk-win-pill { display: none; }
+.vk-win.collapsed { border-radius: var(--r-pill); }
+.vk-win.collapsed > .vk-win-box { display: none; }
+.vk-win.collapsed > .vk-win-pill { display: flex; align-items: center; gap: 2px; min-width: 0; padding-right: 4px; }
+.vk-win-pill-open {
+  flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: 7px; padding: 6px 6px 6px 12px; border: 0;
+  border-radius: var(--r-pill); background: transparent; color: var(--text); font: 600 var(--fs-ctl) var(--font); text-align: left; cursor: pointer;
+}
+.vk-win-pill-open > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* its edges and corners resize it (ts/floatwin.ts adds them) */
+.vk-rz { display: none; }
+.vk-win:not(.collapsed) > .vk-rz { display: block; position: absolute; z-index: 2; touch-action: none; }
+.vk-rz-n, .vk-rz-s { left: 12px; right: 12px; height: 8px; cursor: ns-resize; }
+.vk-rz-e, .vk-rz-w { top: 12px; bottom: 12px; width: 8px; cursor: ew-resize; }
+.vk-rz-n { top: -4px; }
+.vk-rz-s { bottom: -4px; }
+.vk-rz-e { right: -4px; }
+.vk-rz-w { left: -4px; }
+.vk-rz-ne, .vk-rz-nw, .vk-rz-se, .vk-rz-sw { width: 16px; height: 16px; }
+.vk-rz-ne { top: -5px; right: -5px; cursor: nesw-resize; }
+.vk-rz-sw { bottom: -5px; left: -5px; cursor: nesw-resize; }
+.vk-rz-nw { top: -5px; left: -5px; cursor: nwse-resize; }
+.vk-rz-se { bottom: -5px; right: -5px; cursor: nwse-resize; }
+
+/* ---------------------------------------------------------------- the corners of the content */
+
+/* a legend or a key: folded to a glass chip at the bottom left, open to a card that grows upwards */
+.vk-corner { position: fixed; bottom: var(--edge); z-index: var(--z-panel); display: flex; align-items: flex-end; gap: 8px; pointer-events: none; }
+.vk-corner > * { pointer-events: auto; }
+.vk-corner.left { left: calc(var(--edge) + var(--corner-left, 0px)); }
+.vk-corner.right { right: var(--edge); }
+.vk-chipbtn {
+  display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 9px; border-radius: var(--r-pill);
+  border: 0.5px solid var(--line); background: var(--surface); color: var(--text);
+  backdrop-filter: saturate(180%) blur(16px); -webkit-backdrop-filter: saturate(180%) blur(16px);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06); font: 500 12px var(--font); white-space: nowrap; cursor: pointer;
+}
+.vk-chipbtn:hover { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
+.vk-card { display: flex; flex-direction: column; gap: 6px; width: 228px; padding: 8px 10px 9px; border-radius: var(--r-xl); }
+
+/* ---------------------------------------------------------------- the loader */
+
+.vk-loader {
+  position: fixed; inset: 0; z-index: var(--z-loader); display: grid; place-items: center; background: var(--canvas);
+  transition: opacity 0.4s;
+}
+.vk-loader.gone { opacity: 0; pointer-events: none; }
+.vk-loader-box { text-align: center; max-width: 640px; padding: 16px; }
+.vk-loader-title { color: var(--text-2); margin: 8px 0 14px; }
+.vk-loader-log { text-align: left; color: var(--text-3); font: var(--fs-xs)/1.5 var(--mono); white-space: pre-wrap; min-height: 9em; }
+
+/* ---------------------------------------------------------------- narrow screens */
+
+/* a phone: the side panel goes, the drawer is a sheet from the bottom, a window the whole screen */
+@media (max-width: 700px) {
+  :root { --edge: 8px; }
+  .vk-side { display: none; }
+  /* the bar keeps the logo, the search and icons: the rest gives way */
+  .vk-topbar { gap: 8px; padding: 0 8px 0 10px; }
+  .vk-topbar-end { flex: 0 1 auto; gap: 6px; }
+  .vk-brand-sub, .vk-brand > .vk-pill, .vk-brand .vk-nav { display: none; }
+  .vk-search { width: 110px; }
+  .vk-search:focus { width: min(220px, 55vw); }
+  .vk-topbar .vk-act > span:not(.vk-badge) { display: none; }
+  .vk-topbar .vk-act { width: 32px; padding: 0; justify-content: center; }
+  .vk-seg button { padding: 5px 8px; }
+  .vk-drawer {
+    top: auto; left: 0; right: 0; bottom: 0; width: auto; height: var(--sheet-h, 55dvh); max-height: calc(100dvh - 60px);
+    border-radius: var(--r-3xl) var(--r-3xl) 0 0; padding: 26px 16px calc(24px + env(safe-area-inset-bottom)); z-index: 30;
+    background: var(--surface-solid); box-shadow: 0 -1px 0 var(--line), 0 -8px 30px rgba(0, 0, 0, 0.12);
+    transform: translateY(105%); overscroll-behavior: contain;
+  }
+  .vk-drawer.open { transform: none; }
+  /* the sheet's grip */
+  .vk-drawer::before { content: ""; position: sticky; top: -18px; display: block; width: 40px; height: 5px; margin: -18px auto 13px; border-radius: 3px; background: var(--text-3); opacity: 0.6; }
+  /* a window docks at the bottom, the screen's width, placed by the page (ts/floatwin.ts, docked);
+     one marked .full — a document the reader came to read — takes the whole screen */
+  .vk-win:not(.collapsed) {
+    left: var(--edge) !important; right: var(--edge) !important; top: auto !important; bottom: calc(var(--edge) + env(safe-area-inset-bottom)) !important;
+    width: auto !important; height: auto !important; min-width: 0 !important; min-height: 0 !important;
+    max-width: none !important; max-height: 60dvh !important;
+  }
+  .vk-win.full:not(.collapsed) {
+    left: 0 !important; top: 0 !important; right: 0 !important; bottom: 0 !important; max-height: none !important; border-radius: 0 !important;
+    padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); z-index: 48 !important;
+  }
+  .vk-win .vk-rz { display: none !important; }
+  .vk-win-head { cursor: default; }
+}

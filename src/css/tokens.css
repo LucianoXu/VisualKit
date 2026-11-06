@@ -1,0 +1,182 @@
+/* VisualKit tokens: the design language of VisualProof, as custom properties.
+   "Quiet surfaces, one gradient for what matters."
+
+   Every colour the dark theme changes is in its one block below; what it leaves out is the light
+   theme's. Code that draws in the theme's colours itself (a canvas, a chart) reads them from these
+   properties as it draws and draws again on a theme change (ts/theme.ts, onThemeChange).
+
+   Text tokens are checked for contrast: --text-2 and --text-3 are at least 4.5:1 (WCAG AA) on the
+   ground and on a solid surface, in both themes. Keep that true when you change them. */
+
+:root {
+  color-scheme: light;
+
+  /* ---------------------------------------------------------------- type */
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", Roboto, sans-serif;
+  --mono: "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  /* the scale: body 13, controls 12.5, small 11.5, overline 11; titles 15 (window, modal), 18
+     (drawer), 26 (the gradient name), 40 (the loader's logo) */
+  --fs-xs: 11px;
+  --fs-sm: 11.5px;
+  --fs-ctl: 12.5px;
+  --fs-body: 13px;
+  --fs-h3: 15px;
+  --fs-h2: 18px;
+  --fs-h1: 26px;
+
+  /* ---------------------------------------------------------------- ground, surfaces, text */
+  --canvas: #f5f5f7;
+  /* glass: translucent over the canvas, blurred (.vk-glass) */
+  --surface: rgba(255, 255, 255, 0.78);
+  --surface-solid: #ffffff;
+  --line: rgba(0, 0, 0, 0.08);
+  --text: #1d1d1f;
+  /* 5.8:1 on the ground, 6.4:1 on a solid surface */
+  --text-2: #5f5f64;
+  /* 4.5:1 and 4.9:1: a step apart from --text-2 (L* 40 and 47) */
+  --text-3: #707075;
+  /* a quiet tint: code, a segmented control's track, a row under the pointer */
+  --code-bg: rgba(0, 0, 0, 0.035);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 8px 28px rgba(0, 0, 0, 0.09);
+  --shadow-lg: 0 2px 6px rgba(0, 0, 0, 0.06), 0 22px 60px rgba(0, 0, 0, 0.14);
+
+  /* ---------------------------------------------------------------- the one gradient, the accent */
+  /* the brand gradient: the logo, the name of what is selected, a progress bar. Used sparingly:
+     it marks what matters, so it must stay rare */
+  --grad: linear-gradient(100deg, #5e5ce6 0%, #bf5af2 52%, #ff375f 100%);
+  /* its relatives, for numbers that stand side by side (.vk-stat) */
+  --grad-violet: linear-gradient(100deg, #5e5ce6, #bf5af2);
+  --grad-cool: linear-gradient(100deg, #0a84ff, #64d2ff);
+  --grad-warm: linear-gradient(100deg, #ff9f0a, #ff375f);
+  /* the accent: links, what is lit, focus rings, the selected tab. 4.5:1 on the ground */
+  --accent: #7655e9;
+
+  /* ---------------------------------------------------------------- meaning */
+  /* good, informative, wrong; written as text they keep 4.5:1 */
+  --ok: #2fb36b;
+  --info: #3d74d4;
+  --warn: #f2a33a;
+  --bad: #e5484d;
+  /* solid buttons in those colours take white text at 4.5:1 or more */
+  --ok-btn: color-mix(in srgb, var(--ok) 74%, black);
+  --info-btn: color-mix(in srgb, var(--info) 88%, black);
+  /* banners: text on a tint of its own colour */
+  --banner-bad: #c4161c;
+  --banner-warn: #a05a00;
+  --banner-info: #0a5fc4;
+  /* status dots: failed, running, attention, idle, fine */
+  --st-failed: #ff3b30;
+  --st-running: #0a84ff;
+  --st-attention: #ff9f0a;
+  --st-idle: #8e8e93;
+  --st-ok: #30b158;
+  /* a star, a highlight that is a mark rather than a state */
+  --star: #f5b301;
+
+  /* ---------------------------------------------------------------- palettes */
+  /* categorical: one colour per kind of thing (VisualProof's declaration kinds) */
+  --cat-1: #0a84ff;
+  --cat-2: #40c8e0;
+  --cat-3: #30b158;
+  --cat-4: #2fa37a;
+  --cat-5: #ff9f0a;
+  --cat-6: #a395e0;
+  --cat-7: #ff6b3d;
+  --cat-8: #ff375f;
+  --cat-9: #a2845e;
+  --cat-muted: #aeaeb2;
+  /* colour-blind safe, for states that must be told apart by everyone (Okabe and Ito) */
+  --cb-orange: #e69f00;
+  --cb-sky: #56b4e9;
+  --cb-green: #009e73;
+  --cb-yellow: #f0e442;
+  --cb-blue: #0072b2;
+  --cb-vermilion: #d55e00;
+  --cb-purple: #cc79a7;
+
+  /* ---------------------------------------------------------------- code */
+  --tk-keyword: #ad3da4;
+  --tk-type: #3e7fd6;
+  --tk-comment: #8a8a8e;
+  --tk-string: #c4392b;
+  --tk-number: #6c5ce7;
+  --tk-attr: #b5762c;
+
+  /* ---------------------------------------------------------------- shape */
+  /* radii, from a field to the bar: what is larger and further from the pointer is rounder */
+  --r-xs: 4px;   /* inline code */
+  --r-sm: 7px;   /* fields, small buttons, menu items */
+  --r-md: 9px;   /* toolbar buttons, segmented controls (10) */
+  --r-lg: 12px;  /* menus, results, cards */
+  --r-xl: 14px;  /* popovers, windows, modals */
+  --r-2xl: 16px; /* the bar, the side panel */
+  --r-3xl: 18px; /* the drawer */
+  --r-pill: 999px;
+
+  /* ---------------------------------------------------------------- layout */
+  /* the margin every floating thing keeps from the viewport's edges (ts/floatwin.ts, EDGE) */
+  --edge: 12px;
+  --bar-h: 48px;
+  /* where panels start under the bar (and an optional second strip of tabs) */
+  --top: calc(var(--edge) + var(--bar-h) + 8px);
+  --top-tabs: 108px;
+  --bottom: 56px;
+  --side-w: 268px;
+  --drawer-w: 400px;
+
+  /* ---------------------------------------------------------------- motion */
+  /* a panel sliding in: quick start, long settle */
+  --ease-out: cubic-bezier(0.2, 0.9, 0.25, 1);
+  /* something the camera does, or that moves with it: symmetric */
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 0.15s;
+  --dur-panel: 0.32s;
+
+  /* ---------------------------------------------------------------- layers */
+  /* one order for the whole page: the content, panels over it, the bar, floating windows,
+     popovers, menus, modals, the loader */
+  --z-panel: 6;
+  --z-strip: 15;
+  --z-bar: 20;
+  --z-windows: 35;
+  --z-popover: 36;
+  --z-menu: 38;
+  --z-modal: 40;
+  --z-loader: 50;
+}
+
+/* Dark: "Midnight". A blue-black ground, its surfaces, lines and tints the same blue, its text a cool
+   white. Set by data-theme on <html> (ts/theme.ts; its head script sets it before the first paint). */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --canvas: #0d1017;
+  --surface: rgba(23, 27, 37, 0.84);
+  --surface-solid: #181c26;
+  --line: rgba(170, 185, 255, 0.11);
+  /* 4.5:1 or more wherever they are written, a code tint included */
+  --text: #eef0f6;
+  --text-2: #a4a9ba;
+  --text-3: #878d9f;
+  --code-bg: rgba(160, 178, 255, 0.07);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 28px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 2px 6px rgba(0, 0, 0, 0.4), 0 22px 60px rgba(0, 0, 0, 0.6);
+  /* 6.2:1 */
+  --accent: #a08cff;
+
+  --info: #5085e0;
+  --bad: #ec5a5f;
+  --banner-bad: #ff7b72;
+  --banner-warn: #ffc56b;
+  --banner-info: #7ab8ff;
+
+  --cat-6: #8b7fd0;
+  --cat-9: #b89b74;
+  --cat-muted: #5f6578;
+
+  --tk-keyword: #ff7ab2;
+  --tk-type: #6bdfff;
+  --tk-comment: #7f8c98;
+  --tk-string: #ff8170;
+  --tk-number: #d9c97c;
+  --tk-attr: #ffa14f;
+}

@@ -1,0 +1,72 @@
+/* VisualKit content: what panels and windows hold — numbers, lists, code, light Markdown. */
+
+/* ---------------------------------------------------------------- numbers */
+
+/* big numbers side by side, each in its gradient, its label under it */
+.vk-stats { display: grid; grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); gap: 8px; margin: 6px 0 14px; }
+.vk-stat { background: var(--code-bg); border-radius: var(--r-lg); padding: 10px 12px; }
+.vk-stat-n {
+  font-size: 24px; font-weight: 700; letter-spacing: -0.02em; font-variant-numeric: tabular-nums;
+  background-image: var(--g, var(--grad)); -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.vk-stat-l { color: var(--text-2); font-size: var(--fs-sm); line-height: 1.3; }
+
+/* ---------------------------------------------------------------- lists */
+
+/* a row: the whole line a button, a tint under the pointer */
+.vk-row {
+  display: flex; align-items: center; gap: 8px; width: 100%; border: 0; background: transparent; text-align: left;
+  padding: 4px 6px; border-radius: var(--r-sm); font-size: 12px; color: var(--text); cursor: pointer;
+}
+.vk-row:hover, .vk-row:focus-visible { background: var(--code-bg); outline: none; }
+.vk-row.on { background: color-mix(in srgb, var(--accent) 9%, transparent); }
+.vk-row-l { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vk-row-r { color: var(--text-3); font-size: var(--fs-xs); white-space: nowrap; font-variant-numeric: tabular-nums; }
+/* an action on a row shows on the row under the pointer, or with the keyboard on it */
+.vk-row-act { visibility: hidden; }
+.vk-row:is(:hover, :focus-within) .vk-row-act, .vk-row-act:focus-visible { visibility: visible; }
+
+/* a timeline: a day in spaced capitals, then what happened, the time in a column of its own */
+.vk-day { margin: 14px 0 4px; font-size: var(--fs-sm); font-weight: 600; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.04em; }
+.vk-event { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px; padding: 6px 0; border-top: 1px solid var(--line); font-size: var(--fs-ctl); line-height: 1.45; }
+.vk-event-time { color: var(--text-3); font-variant-numeric: tabular-nums; font-size: var(--fs-sm); padding-top: 1px; white-space: nowrap; min-width: 34px; }
+
+/* a key: a swatch, a name, a count */
+.vk-key { display: grid; grid-template-columns: 10px minmax(0, 1fr) auto; align-items: center; gap: 7px; padding: 1px 2px; font-size: 12px; }
+.vk-key > i { width: 9px; height: 9px; border-radius: 50%; background: var(--c); }
+.vk-key > b { font-weight: 400; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vk-key > span { color: var(--text-2); font-variant-numeric: tabular-nums; font-size: var(--fs-sm); }
+
+/* a definition list: a label column, a value column */
+.vk-dl { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 6px 10px; align-items: baseline; padding: 8px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.vk-dl > dt { font-size: var(--fs-sm); color: var(--text-2); }
+.vk-dl > dd { margin: 0; font-size: var(--fs-body); line-height: 1.4; overflow-wrap: anywhere; }
+
+/* a note on a tint: why something is so, a chain of steps */
+.vk-aside { margin: 0 0 12px; padding: 8px 10px; background: var(--code-bg); border-radius: 10px; font-size: 12px; }
+
+/* ---------------------------------------------------------------- code */
+
+.vk-code {
+  font: 12px/1.55 var(--mono); background: var(--code-bg); border-radius: 10px;
+  padding: 10px 12px; margin: 0 0 12px; white-space: pre-wrap; word-break: break-word;
+}
+/* lines removed and added: tinted in both themes, their marks in a gutter */
+.vk-diff { font: var(--fs-sm)/1.5 var(--mono); border-radius: 8px; overflow: hidden; background: var(--code-bg); }
+.vk-diff > div { display: grid; grid-template-columns: 16px 1fr; padding-right: 8px; white-space: pre-wrap; word-break: break-word; }
+.vk-diff > div::before { text-align: center; user-select: none; content: ""; }
+.vk-diff > .del { background: color-mix(in srgb, var(--bad) 14%, transparent); }
+.vk-diff > .del::before { content: "−"; color: color-mix(in srgb, var(--bad) 75%, var(--text)); }
+.vk-diff > .add { background: color-mix(in srgb, var(--ok) 16%, transparent); }
+.vk-diff > .add::before { content: "+"; color: color-mix(in srgb, var(--ok) 70%, var(--text)); }
+
+/* ---------------------------------------------------------------- light Markdown (ts/markdown.ts) */
+
+.vk-md { white-space: normal; overflow-wrap: anywhere; }
+.vk-md > * + * { margin-top: 5px; }
+.vk-md p { margin: 0; white-space: pre-wrap; }
+.vk-md code { font: var(--fs-sm) var(--mono); background: var(--code-bg); padding: 0 3px; border-radius: var(--r-xs); }
+.vk-md pre { margin: 0; padding: 6px 8px; border-radius: 6px; font: var(--fs-sm)/1.5 var(--mono); background: var(--code-bg); white-space: pre-wrap; }
+.vk-md pre code { background: none; padding: 0; }
+.vk-md blockquote { margin: 0; padding: 1px 0 1px 9px; border-left: 2px solid color-mix(in srgb, var(--accent) 55%, transparent); color: var(--text-2); }
+.vk-md ul, .vk-md ol { margin: 0; padding-left: 18px; }
