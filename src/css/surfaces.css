@@ -6,6 +6,7 @@
      the bar          glass, the full width at the top              --z-bar
      the side panel   glass, at the left                            --z-panel
      the drawer       glass, slides in from the right               --z-panel
+     the player       glass, at the foot, between the panels        --z-panel
      windows          solid, moved and resized by the reader        --z-windows
      popovers         solid, ringed, from a button                  --z-popover
      the menu         solid, ringed, at the pointer                 --z-menu
@@ -239,7 +240,11 @@
 
 /* ---------------------------------------------------------------- the corners of the content */
 
-/* a legend or a key: folded to a glass chip at the bottom left, open to a card that grows upwards */
+/* a legend or a key: folded to a glass chip at the bottom left, open to a card that grows upwards.
+   On the panels' layer, where what comes later in the page lies over what comes earlier: put a
+   corner after the side panel, so that its card opens over the panel. (After the drawer too, it
+   would lie over the drawer where they met; the left corner keeps to the side panel's column, and
+   on a phone the drawer's sheet is on a layer of its own, over both.) */
 .vk-corner { position: fixed; bottom: var(--edge); z-index: var(--z-panel); display: flex; align-items: flex-end; gap: 8px; pointer-events: none; }
 .vk-corner > * { pointer-events: auto; }
 .vk-corner.left { left: calc(var(--edge) + var(--corner-left, 0px)); }
@@ -252,6 +257,43 @@
 }
 .vk-chipbtn:hover { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
 .vk-card { display: flex; flex-direction: column; gap: 6px; width: 228px; padding: 8px 10px 9px; border-radius: var(--r-xl); }
+
+/* ---------------------------------------------------------------- the player */
+
+/* a strip at the foot of the content for what plays over time (ts/player.ts): glass, centred on
+   what the panels leave of the content (--inset-left, --inset-right, ts/drawer.ts), sliding with
+   them as the drawer comes and goes. It fills the room the panels leave above --bottom.
+
+   It is never narrower than --player-min (360px): where the panels leave less, it reaches under
+   the drawer, whose column is free in that row (the drawer stops at --bottom). Narrower still (a
+   phone), its parts give way by its own width: the length first, then the speeds become the one in
+   force (a press goes to the next), then the time. */
+.vk-player {
+  position: fixed; bottom: var(--edge); z-index: var(--z-panel);
+  left: calc(var(--inset-left, 0px) + 24px);
+  right: max(var(--edge), min(calc(var(--inset-right, 0px) + 24px), calc(100vw - var(--inset-left, 0px) - 24px - var(--player-min, 360px))));
+  max-width: 760px; margin: 0 auto; height: var(--player-h); padding: 0 12px 0 6px; border-radius: var(--r-2xl);
+  display: flex; align-items: center; gap: 10px; container: vk-player / inline-size;
+  transition: left var(--dur-panel) var(--ease-out), right var(--dur-panel) var(--ease-out);
+}
+.vk-player .vk-act.icon { border-radius: 50%; }
+/* play and pause are both in the button, one shown: nothing under the pointer is replaced */
+.vk-player-play:not(.playing) > svg + svg, .vk-player-play.playing > svg:first-child { display: none; }
+.vk-player-time { font: var(--fs-ctl) var(--font); font-variant-numeric: tabular-nums; color: var(--text-2); white-space: nowrap; }
+.vk-player-time > b { color: var(--text); font-weight: 600; }
+.vk-player-track { flex: 1; min-width: 60px; margin: 0; accent-color: var(--accent); background: transparent; cursor: pointer; }
+.vk-player-speed { flex: none; }
+@container vk-player (max-width: 440px) { .vk-player-total { display: none; } }
+@container vk-player (max-width: 380px) { .vk-player-speed button:not(.on) { display: none; } }
+@container vk-player (max-width: 260px) { .vk-player-time { display: none; } }
+
+/* Where the player meets a corner. The left corner keeps its own place, under the side panel
+   (--corner-left 0), in the room the panel leaves above --bottom, and opens upwards over the panel:
+   the player starts right of the panel, so the two never meet. A page with a player keeps the
+   corner there rather than beside the panel, and keeps the right corner free. Where no side panel
+   is shown — <html data-side="none">, which insets() (ts/drawer.ts) writes from the panel's box,
+   however it was hidden — the left corner rises over the player. A player not in use is `hidden`. */
+:root[data-side="none"]:has(.vk-player:not([hidden])) .vk-corner.left { bottom: calc(var(--edge) + var(--player-h) + 8px); }
 
 /* ---------------------------------------------------------------- the loader */
 
@@ -300,5 +342,8 @@
     padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); z-index: 48 !important;
   }
   .vk-win .vk-rz { display: none !important; }
+  /* the player the screen's width (its parts giving way by its width, above); the corners over it */
+  .vk-player { left: var(--edge); right: var(--edge); bottom: calc(var(--edge) + env(safe-area-inset-bottom)); gap: 6px; padding-right: 8px; }
+  :root:has(.vk-player:not([hidden])) .vk-corner { bottom: calc(var(--edge) + var(--player-h) + 8px + env(safe-area-inset-bottom)); }
   .vk-win-head { cursor: default; }
 }

@@ -15,6 +15,7 @@ import { windowsPart } from "./partwindows.ts";
 import { menuPart } from "./partmenu.ts";
 import { legendPart } from "./partlegend.ts";
 import { livePart } from "./partlive.ts";
+import { playerPart } from "./partplayer.ts";
 import { keysPart } from "./partkeys.ts";
 
 themeKey("visualkit-demo:theme");
@@ -32,10 +33,15 @@ const page = await makePage<Page>(
     at: 0,
     unfolded: new Set(["uses"]),
     tick: 0,
+    time: 0,
+    playing: false,
+    speed: 1,
+    filter: false,
   },
-  [canvasPart, barPart, stripPart, sidePart, drawerPart, windowsPart, menuPart, legendPart, livePart, keysPart],
+  [canvasPart, barPart, stripPart, sidePart, drawerPart, windowsPart, menuPart, legendPart, livePart, playerPart, keysPart],
   { strict: true },
 );
 
 page.refresh();
+page.play(true);
 $("#loader").classList.add("gone");

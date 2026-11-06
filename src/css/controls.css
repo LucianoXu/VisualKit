@@ -52,6 +52,8 @@
 }
 .vk-icon:hover { background: var(--code-bg); color: var(--text); }
 .vk-icon svg { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+/* a toggle (a filter on, say): lit in the accent while pressed */
+.vk-icon[aria-pressed="true"] { color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); }
 /* round, on a tint: a panel's close */
 .vk-icon.round { border-radius: 50%; background: var(--code-bg); }
 

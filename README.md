@@ -39,9 +39,9 @@ and motion on one scale.
 
 ### 🧩 Components
 
-A glass bar, side panel and sliding drawer; floating windows; popovers, a context menu, modals;
-buttons, segmented controls, tabs, switches, fields, chips, badges, banners; stats, lists, code,
-diffs and light Markdown.
+A glass bar, side panel and sliding drawer; a player strip; floating windows; popovers, a context
+menu, modals; buttons, segmented controls, tabs, switches, fields, chips, badges, banners; stats,
+sparklines, lists, code, diffs and light Markdown.
 
 </td>
 <td width="33%" valign="top">
@@ -118,12 +118,13 @@ plain CSS. Take everything with `visualkit/css`, or a layer at a time from `visu
 |---|---|---|
 | **Theme** | `tokens.css`: `data-theme="dark"` on `<html>` | `setTheme`, `onThemeChange`, `token("--accent")`, `themeChoices`, `reducedMotion` |
 | **Bar & panels** | `.vk-topbar` `.vk-strip` `.vk-side` `.vk-drawer` `.vk-sec` | `Drawer`, `insets()` |
+| **Player** | `.vk-player` `.vk-player-play` `.vk-player-time` `.vk-player-track` `.vk-player-speed` | `Player`, `clock` |
 | **Floating windows** | `.vk-windows` `.vk-win` `.vk-win-head` `.vk-win-pill` | `FloatWindow`, `storageKeeper`, `cascadeRect` |
 | **Popovers & menus** | `.vk-popover` `.vk-menu` `.vk-results` `.vk-hintcard` | `Popover`, `ContextMenu`, `contextMenuOn`, `hint` |
 | **Modals** | `.vk-modal` `.vk-modal-box` `.vk-actions` | `confirm`, `ask`, `modal` |
-| **Controls** | `.vk-btn` (`primary` `ok` `info` `soft` `bad`) `.vk-act` `.vk-icon` `.vk-nav` `.vk-seg` `.vk-tabs` `.vk-switch` `.vk-input` `.vk-search` | `icon("share")` |
+| **Controls** | `.vk-btn` (`primary` `ok` `info` `soft` `bad`) `.vk-act` `.vk-icon` (`aria-pressed`) `.vk-nav` `.vk-seg` `.vk-tabs` `.vk-switch` `.vk-input` `.vk-search` | `icon("share")`, `ICON_NAMES` (`play` `pause` `filter` among them) |
 | **Marks** | `.vk-chip` `.vk-badge` `.vk-dot` `.vk-pill` `.vk-banner` `.vk-avatar` `.vk-progress` `.vk-meter` | |
-| **Content** | `.vk-title` `.vk-stats` `.vk-row` `.vk-event` `.vk-key` `.vk-dl` `.vk-code` `.vk-diff` `.vk-md` | `markdown`, `html`, `escapeHtml` |
+| **Content** | `.vk-title` `.vk-stats` `.vk-spark` `.vk-row` `.vk-event` `.vk-key` `.vk-dl` `.vk-code` `.vk-diff` `.vk-md` | `sparkline`, `markdown`, `html`, `escapeHtml` |
 | **Keeping things** | | `keepFocus`, `holdPress`, `focusBack`, `kept`, `trapFocus` |
 | **The page** | | `makePage` |
 
@@ -171,7 +172,7 @@ working page to copy.
 ```bash
 npm install
 npm run demo        # the demo at http://localhost:5178, rebuilt on change (and /tokens.html)
-npm test            # window geometry, HTML escaping, Markdown, focus keys, held presses, makePage
+npm test            # window geometry, HTML escaping, Markdown, focus keys, held presses, sparklines, makePage
 npm run typecheck
 ```
 

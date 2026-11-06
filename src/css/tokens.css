@@ -121,6 +121,9 @@
   --top: calc(var(--edge) + var(--bar-h) + 8px);
   --top-tabs: 108px;
   --bottom: 56px;
+  /* the player at the foot of the content (.vk-player): it fills the room the panels leave above
+     --bottom, a margin from the viewport's edge */
+  --player-h: 44px;
   --side-w: 268px;
   --drawer-w: 400px;
 

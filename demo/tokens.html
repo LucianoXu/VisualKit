@@ -30,6 +30,8 @@
     .texts { display: flex; gap: 16px; font-size: 14px; }
     .line { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
     .panel { padding: 14px 16px; border-radius: var(--r-2xl); }
+    .sparks { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .vk-player.specimen { position: static; max-width: none; margin: 0; transition: none; }
   </style>
 </head>
 <body>
@@ -50,6 +52,12 @@
       <div class="line"><div class="vk-seg"><button class="on">Selection</button><button>Uses</button><button>Used by</button></div>
         <button class="vk-switch" role="switch" aria-checked="true"><i></i>On</button>
         <span class="vk-pill"><span class="vk-dot ok"></span>Built</span><span class="vk-chip accent">new</span><span class="vk-badge">3</span></div></div>
+    <div class="row"><span class="vk-overline">Sparklines</span>
+      <!-- sparkline() output (ts/spark.ts); the second in --c -->
+      <div class="sparks"><div><svg class="vk-spark" viewBox="0 0 100 32" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path class="a" d="M0.00 19.63L9.09 16.17L18.18 17.90L27.27 12.72L36.36 9.26L45.45 12.02L54.55 4.07L63.64 6.49L72.73 2.00L81.82 5.80L90.91 8.57L100.00 10.99L100.00 30.00L0.00 30.00Z"/><path class="t" d="M0.00 3.73H100.00"/><path class="l" d="M0.00 19.63L9.09 16.17L18.18 17.90L27.27 12.72L36.36 9.26L45.45 12.02L54.55 4.07L63.64 6.49L72.73 2.00L81.82 5.80L90.91 8.57L100.00 10.99"/><path class="p" d="M100.00 10.99h0"/></svg></div><div style="--c: var(--info)"><svg class="vk-spark" viewBox="0 0 100 32" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path class="a" d="M0.00 2.00L9.09 6.67L18.18 4.33L27.27 9.00L36.36 7.83L45.45 13.67L54.55 16.00L63.64 15.07L72.73 18.33L81.82 20.20L90.91 19.27L100.00 22.77L100.00 30.00L0.00 30.00Z"/><path class="l" d="M0.00 2.00L9.09 6.67L18.18 4.33L27.27 9.00L36.36 7.83L45.45 13.67L54.55 16.00L63.64 15.07L72.73 18.33L81.82 20.20L90.91 19.27L100.00 22.77"/><path class="p" d="M100.00 22.77h0"/></svg></div></div></div>
+    <div class="row"><span class="vk-overline">Player</span>
+      <!-- Player (ts/player.ts) makes this; here in the flow rather than fixed at the foot -->
+      <div class="vk-player vk-glass specimen"><button type="button" class="vk-act icon vk-player-play playing" aria-label="Pause"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M5 3.4v9.2L12.4 8z"/></svg><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M5.5 3.5v9M10.5 3.5v9"/></svg></button><span class="vk-player-time"><b>1:34</b><span class="vk-player-total"> / 3:00</span></span><input class="vk-player-track" type="range" min="0" max="180" step="any" value="94" aria-label="Playhead"><div class="vk-seg mini vk-player-speed"><button class="on">1×</button><button>2×</button></div><button class="vk-icon" aria-pressed="true" aria-label="Filter"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M2.5 3.5h11l-4.2 5v4l-2.6 1.2V8.5z"/></svg></button></div></div>
     <div class="row"><span class="vk-overline">Surfaces</span>
       <div class="panel vk-glass">
         <div class="vk-drawer-kicker"><span class="vk-dot" style="background: var(--cat-6)"></span>theorem · Algebra</div>

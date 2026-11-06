@@ -4,7 +4,7 @@
 //
 // A part of the page: demo/src/main.ts makes the parts in order, demo/src/page.ts says what they share.
 
-import { $, cascadeRect, EDGE, FloatWindow, html, icon, raw, storageKeeper, markdown, fitBox } from "../../src/ts/index.ts";
+import { $, cascadeRect, EDGE, FloatWindow, html, icon, raw, storageKeeper, markdown, fitBox, token } from "../../src/ts/index.ts";
 import type { Rect } from "../../src/ts/index.ts";
 import type { Page } from "./page.ts";
 
@@ -93,10 +93,12 @@ export function windowsPart(page: Page): WindowsPart {
     keepsCollapsed: true,
     fit: {
       bounds: (vp) => ({ max: { w: Math.min(360, vp.w - 2 * EDGE), h: vp.h / 2 }, min: { w: 220, h: 80 } }),
-      // at the bottom right of the board: beside the drawer while it is open, never over it
+      // at the bottom right of the board: beside the drawer while it is open, never over it; over
+      // the player's row, which may reach under it
       at: (s, vp) => {
         const right = parseFloat(document.documentElement.style.getPropertyValue("--inset-right")) || 0;
-        return { x: Math.max(EDGE, vp.w - s.w - EDGE - (right ? right + 8 : 0)), y: vp.h - s.h - EDGE, ...s };
+        const player = parseFloat(token("--player-h")) + 8;
+        return { x: Math.max(EDGE, vp.w - s.w - EDGE - (right ? right + 8 : 0)), y: vp.h - s.h - EDGE - player, ...s };
       },
     },
   });

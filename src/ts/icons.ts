@@ -27,6 +27,10 @@ const PATHS = {
   sun: `<circle cx="8" cy="8" r="3"/><path d="M8 1.5v1.5M8 13v1.5M1.5 8H3M13 8h1.5M3.4 3.4l1 1M11.6 11.6l1 1M3.4 12.6l1-1M11.6 4.4l1-1"/>`,
   moon: `<path d="M13 9.5A5.5 5.5 0 0 1 6.5 3a5.5 5.5 0 1 0 6.5 6.5Z"/>`,
   monitor: `<rect x="2" y="3" width="12" height="8.5" rx="1.5"/><path d="M6 14h4M8 11.5V14"/>`,
+  // a player's: the triangle's joins round like every stroke here, so it reads as one at 14px
+  play: `<path d="M5 3.4v9.2L12.4 8z"/>`,
+  pause: `<path d="M5.5 3.5v9M10.5 3.5v9"/>`,
+  filter: `<path d="M2.5 3.5h11l-4.2 5v4l-2.6 1.2V8.5z"/>`,
   settings: `<circle cx="8" cy="8" r="2.2"/><path d="M8 1.8v1.6M8 12.6v1.6M1.8 8h1.6M12.6 8h1.6M3.6 3.6l1.1 1.1M11.3 11.3l1.1 1.1M3.6 12.4l1.1-1.1M11.3 4.7l1.1-1.1"/>`,
 } as const;
 
