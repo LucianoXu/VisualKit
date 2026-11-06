@@ -68,10 +68,21 @@ A part draws its region from the page's state, as an HTML string:
   `"false"` rather than `""`, which no `[aria-expanded="false"]` rule would match. HTML's boolean
   attributes (`hidden`, `disabled`, `checked`) are on by being there: write them or leave them out
   (`${off && raw(" disabled")}`), never `disabled="${b}"`. An unquoted value is quoted for you.
+  Each template is read on its own, from content: a fragment that starts inside a tag
+  (`<button${html` aria-pressed="${on}"`}>`) is not known to be in one, so its `false` writes
+  nothing. Write the attribute in the template that holds the tag (`<button aria-pressed="${on}">`),
+  or `String(on)` in the fragment.
 - **`keepFocus(root, draw)`** redraws `root` and puts the focus back on the like of what had it, found
   by its tag and data attributes and those of the row holding it. So give controls of redrawn
   regions data attributes that say what they are for (`data-id`, `data-act`) — they are also what
   the region's single delegated click handler reads.
+- **`holdPress(root, draw)`** is for a region drawn again by itself — on a timer, on live data. A
+  click is a press and a release on the same element, so a button replaced between the two gets no
+  click. The function it returns draws at once, or, while a pointer is pressed in `root` (or Space
+  held on a control there), once the press ends and after its click:
+  `const drawSide = holdPress(body, () => keepFocus(body, () => { body.innerHTML = … }))`. A hold
+  ends ten seconds past the press's last event at most (a slow click is still a click), and at once
+  when the page loses the focus or is hidden.
 - One listener per region, delegated (`closest("[data-act]")`), registered once when the part is
   made, never re-registered on redraw.
 

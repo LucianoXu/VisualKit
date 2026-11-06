@@ -49,8 +49,8 @@ diffs and light Markdown.
 ### 🧠 Behaviour
 
 Windows that move, resize, snap, collapse to a pill and remember where you put them; menus and
-popovers you can drive entirely from the keyboard; focus kept across redraws; no theme flash on
-load; reduced motion honoured.
+popovers you can drive entirely from the keyboard; focus kept across redraws, and clicks kept through
+them; no theme flash on load; reduced motion honoured.
 
 </td>
 </tr>
@@ -124,7 +124,7 @@ plain CSS. Take everything with `visualkit/css`, or a layer at a time from `visu
 | **Controls** | `.vk-btn` (`primary` `ok` `info` `soft` `bad`) `.vk-act` `.vk-icon` `.vk-nav` `.vk-seg` `.vk-tabs` `.vk-switch` `.vk-input` `.vk-search` | `icon("share")` |
 | **Marks** | `.vk-chip` `.vk-badge` `.vk-dot` `.vk-pill` `.vk-banner` `.vk-avatar` `.vk-progress` `.vk-meter` | |
 | **Content** | `.vk-title` `.vk-stats` `.vk-row` `.vk-event` `.vk-key` `.vk-dl` `.vk-code` `.vk-diff` `.vk-md` | `markdown`, `html`, `escapeHtml` |
-| **Keeping things** | | `keepFocus`, `focusBack`, `kept`, `trapFocus` |
+| **Keeping things** | | `keepFocus`, `holdPress`, `focusBack`, `kept`, `trapFocus` |
 | **The page** | | `makePage` |
 
 ## A page made of parts
@@ -171,7 +171,7 @@ working page to copy.
 ```bash
 npm install
 npm run demo        # the demo at http://localhost:5178, rebuilt on change (and /tokens.html)
-npm test            # window geometry, HTML escaping, Markdown, focus keys, makePage
+npm test            # window geometry, HTML escaping, Markdown, focus keys, held presses, makePage
 npm run typecheck
 ```
 

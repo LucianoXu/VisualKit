@@ -14,6 +14,7 @@ import { drawerPart } from "./partdrawer.ts";
 import { windowsPart } from "./partwindows.ts";
 import { menuPart } from "./partmenu.ts";
 import { legendPart } from "./partlegend.ts";
+import { livePart } from "./partlive.ts";
 import { keysPart } from "./partkeys.ts";
 
 themeKey("visualkit-demo:theme");
@@ -29,8 +30,10 @@ const page = await makePage<Page>(
     tab: "board",
     history: [null],
     at: 0,
+    unfolded: new Set(["uses"]),
+    tick: 0,
   },
-  [canvasPart, barPart, stripPart, sidePart, drawerPart, windowsPart, menuPart, legendPart, keysPart],
+  [canvasPart, barPart, stripPart, sidePart, drawerPart, windowsPart, menuPart, legendPart, livePart, keysPart],
   { strict: true },
 );
 
