@@ -23,8 +23,8 @@ export function sidePart(page: Page): SidePart {
       body.innerHTML = String(html`${groups.map((g) => {
         const members = page.items.filter((it) => it.group === g);
         const n = members.filter((it) => on.has(it.id)).length;
-        // aria-expanded is the fold's whole state: a boolean as the whole value is written as the
-        // word (dom.ts, html), and css/surfaces.css hides the body of a "false" one
+        // aria-expanded is the fold's whole state: a boolean as an aria attribute's whole value is
+        // written as the word (dom.ts, html), and css/surfaces.css hides the body of a "false" one
         return html`<div class="vk-sec">
           <button class="vk-sec-h" data-group="${g}" aria-expanded="${!folded.has(g)}">${g}<span class="vk-sec-aside">${n ? `${n} lit` : members.length}</span></button>
           <div class="vk-sec-body tree">${members.map(
