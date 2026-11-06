@@ -158,13 +158,15 @@ function listen(doc: NonNullable<PressRoot["ownerDocument"]>): void {
  *  Space's release), hold its draws. The held draw runs after the release's click, and not at all
  *  if that click drew the region itself. Enter acts on its press, so it holds nothing.
  *
- *  Draws are never held long: a hold ends `max` ms (1000) after the press's last event — a press
- *  resting longer is not a click on its way — and when the page loses the focus or is hidden.
+ *  Draws are never held for good: a hold ends `max` ms (10 000) after the press's last event, and
+ *  at once when the page loses the focus or is hidden — the ways a press goes unheard. The cap is
+ *  long because a slow click is still a click: a reader who rests on a button for two seconds must
+ *  not lose it; only a press nothing will ever end (a lost pointerup) waits it out.
  *
  *  The document's listeners are one set for all roots; a root is known to them only while it is
  *  pressed, so there is nothing to dispose of. */
 export function holdPress(root: PressRoot, draw: () => void, o: { max?: number } = {}): () => void {
-  const h: Hold = { pointers: new Set(), key: false, missed: false, draw, cap: undefined, max: o.max ?? 1000 };
+  const h: Hold = { pointers: new Set(), key: false, missed: false, draw, cap: undefined, max: o.max ?? 10_000 };
   root.addEventListener("pointerdown", (e) => {
     h.pointers.add((e as PointerEvent).pointerId);
     pressed(h);

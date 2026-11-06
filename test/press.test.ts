@@ -117,6 +117,17 @@ test("holdPress holds no longer than its cap after the press's last event", asyn
   assert.equal(seen.draws, 2);
 });
 
+test("holdPress keeps a slow click: a 3 s press still holds by default", async () => {
+  const { doc, root, seen, draw } = made();
+  fire(root, "pointerdown", { pointerId: 1 });
+  draw();
+  await later(3000);
+  assert.equal(seen.draws, 0, "still held after 3 s");
+  fire(doc, "pointerup", { pointerId: 1 });
+  await later();
+  assert.equal(seen.draws, 1);
+});
+
 test("holdPress: one set of document listeners for every root in it", () => {
   const doc = docOf();
   made(doc);
