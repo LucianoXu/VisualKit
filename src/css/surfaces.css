@@ -241,8 +241,10 @@
 /* ---------------------------------------------------------------- the corners of the content */
 
 /* a legend or a key: folded to a glass chip at the bottom left, open to a card that grows upwards.
-   On the panels' layer: a card opened under the side panel lies over it by coming after it in the
-   page, and under the drawer and its sheet where they meet. */
+   On the panels' layer, where what comes later in the page lies over what comes earlier: put a
+   corner after the side panel, so that its card opens over the panel. (After the drawer too, it
+   would lie over the drawer where they met; the left corner keeps to the side panel's column, and
+   on a phone the drawer's sheet is on a layer of its own, over both.) */
 .vk-corner { position: fixed; bottom: var(--edge); z-index: var(--z-panel); display: flex; align-items: flex-end; gap: 8px; pointer-events: none; }
 .vk-corner > * { pointer-events: auto; }
 .vk-corner.left { left: calc(var(--edge) + var(--corner-left, 0px)); }
