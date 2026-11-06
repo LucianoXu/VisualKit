@@ -62,7 +62,12 @@ naming the part and the key: a part made too early, or state not declared in `st
 A part draws its region from the page's state, as an HTML string:
 
 - **`html`** escapes every value written into the template (arrays joined; `raw(...)` for markup the
-  code itself wrote, such as an icon). Data never reaches `innerHTML` unescaped.
+  code itself wrote, such as an icon). Data never reaches `innerHTML` unescaped. `null`, `undefined`
+  and `false` write nothing, so `${open && html`…`}` leaves nothing when closed; but a boolean that
+  is an `aria-*` attribute's whole value is written as the word, so `aria-expanded="${open}"` says
+  `"false"` rather than `""`, which no `[aria-expanded="false"]` rule would match. HTML's boolean
+  attributes (`hidden`, `disabled`, `checked`) are on by being there: write them or leave them out
+  (`${off && raw(" disabled")}`), never `disabled="${b}"`. An unquoted value is quoted for you.
 - **`keepFocus(root, draw)`** redraws `root` and puts the focus back on the like of what had it, found
   by its tag and data attributes and those of the row holding it. So give controls of redrawn
   regions data attributes that say what they are for (`data-id`, `data-act`) — they are also what
