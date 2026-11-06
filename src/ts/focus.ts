@@ -60,10 +60,91 @@ export function holdFocus(root: HTMLElement, fallback?: string): () => void {
   };
 }
 
-/** What `holdPress` listens on: an element and its document (in tests, stand-ins). */
-export interface PressRoot {
+/** Something `holdPress` listens on (in tests, stand-ins for an element, its document, its window). */
+interface Listened {
   addEventListener(type: string, f: (e: Event) => void, capture?: boolean): void;
-  readonly ownerDocument: { addEventListener(type: string, f: (e: Event) => void, capture?: boolean): void } | null;
+}
+/** What `holdPress` listens on: an element, its document and the document's window. */
+export interface PressRoot extends Listened {
+  readonly ownerDocument: (Listened & { readonly defaultView: Listened | null; readonly visibilityState?: string }) | null;
+}
+
+/** A press in progress in one root. */
+interface Hold {
+  /** the pointers down, by id: released when the last is */
+  pointers: Set<unknown>;
+  /** Space down on a control */
+  key: boolean;
+  /** a draw was asked for under it */
+  missed: boolean;
+  draw: () => void;
+  /** the cap: let go however the press goes on */
+  cap: ReturnType<typeof setTimeout> | undefined;
+  max: number;
+}
+
+/** the presses in progress: only these are known to the document's listeners, so a root that is
+ *  not pressed is held by nothing here */
+const holding = new Set<Hold>();
+/** the documents whose listeners are on: one set for every root in them */
+const listening = new WeakSet<object>();
+
+function run(h: Hold): void {
+  h.missed = false;
+  h.draw();
+}
+
+function letGo(h: Hold): void {
+  holding.delete(h);
+  clearTimeout(h.cap);
+  h.pointers.clear();
+  h.key = false;
+  // a task later: after the click the release brings, which may draw on its own
+  if (h.missed) setTimeout(() => h.missed && run(h), 0);
+}
+
+/** the press goes on: its cap starts again */
+function pressed(h: Hold): void {
+  holding.add(h);
+  clearTimeout(h.cap);
+  h.cap = setTimeout(() => letGo(h), h.max);
+}
+
+function listen(doc: NonNullable<PressRoot["ownerDocument"]>): void {
+  if (listening.has(doc)) return;
+  listening.add(doc);
+  const up = (e: Event) => {
+    for (const h of [...holding]) {
+      h.pointers.delete((e as PointerEvent).pointerId);
+      if (!h.pointers.size && !h.key) letGo(h);
+    }
+  };
+  // released anywhere: the pointer may leave the root before it lets go
+  doc.addEventListener("pointerup", up, true);
+  doc.addEventListener("pointercancel", up, true);
+  doc.addEventListener("pointermove", (e) => {
+    for (const h of [...holding]) {
+      if (!h.pointers.size) continue;
+      // let go outside the window, where no pointerup reaches the page: a move says so
+      if ((e as PointerEvent).buttons === 0) {
+        h.pointers.clear();
+        if (!h.key) letGo(h);
+      } else pressed(h);
+    }
+  }, true);
+  doc.addEventListener("keyup", (e) => {
+    if ((e as KeyboardEvent).key !== " ") return;
+    for (const h of [...holding]) {
+      h.key = false;
+      if (!h.pointers.size) letGo(h);
+    }
+  }, true);
+  // the page left (another window, another tab): what was pressed here is not heard ending
+  const away = () => {
+    for (const h of [...holding]) letGo(h);
+  };
+  doc.defaultView?.addEventListener("blur", away);
+  doc.addEventListener("visibilitychange", () => doc.visibilityState === "hidden" && away());
 }
 
 /** `draw` for a region drawn again by itself (a timer, live data): called while a press is in
@@ -72,39 +153,37 @@ export interface PressRoot {
  *    const drawSide = holdPress(body, () => keepFocus(body, () => { body.innerHTML = … }));
  *
  *  A click is a press and a release on the same element: a button replaced between the two gets
- *  no click, and a region redrawn every second loses a click in ten. So a pointer pressed in
- *  `root`, or Space held on a control in it (a button acts on Space's release), holds its draws.
- *  The held draw runs after the release's click, and not at all if that click drew the region
- *  itself. Enter acts on its press, so it holds nothing. */
-export function holdPress(root: PressRoot, draw: () => void): () => void {
-  let by: "pointer" | "key" | null = null;
-  let missed = false;
-  const run = () => {
-    missed = false;
-    draw();
-  };
-  const release = () => {
-    if (!by) return;
-    by = null;
-    // a task later: after the click the release brings, which may draw on its own
-    if (missed) setTimeout(() => missed && run(), 0);
-  };
-  root.addEventListener("pointerdown", () => (by = "pointer"));
+ *  no click, and a region redrawn every second loses a click in ten. So pointers pressed in
+ *  `root` (until the last is released), or Space held on a control in it (a button acts on
+ *  Space's release), hold its draws. The held draw runs after the release's click, and not at all
+ *  if that click drew the region itself. Enter acts on its press, so it holds nothing.
+ *
+ *  Draws are never held long: a hold ends `max` ms (1000) after the press's last event — a press
+ *  resting longer is not a click on its way — and when the page loses the focus or is hidden.
+ *
+ *  The document's listeners are one set for all roots; a root is known to them only while it is
+ *  pressed, so there is nothing to dispose of. */
+export function holdPress(root: PressRoot, draw: () => void, o: { max?: number } = {}): () => void {
+  const h: Hold = { pointers: new Set(), key: false, missed: false, draw, cap: undefined, max: o.max ?? 1000 };
+  root.addEventListener("pointerdown", (e) => {
+    h.pointers.add((e as PointerEvent).pointerId);
+    pressed(h);
+  });
   root.addEventListener("keydown", (e) => {
-    if ((e as KeyboardEvent).key === " ") by = "key";
+    if ((e as KeyboardEvent).key !== " ") return;
+    h.key = true;
+    pressed(h);
   });
   // the focus gone elsewhere with Space down: its release may never be heard here
-  root.addEventListener("focusout", () => by === "key" && release());
-  const doc = root.ownerDocument;
-  // released anywhere: the pointer may leave `root` before it lets go
-  doc?.addEventListener("pointerup", release, true);
-  doc?.addEventListener("pointercancel", release, true);
-  // let go outside the window, where no pointerup reaches the page: the next move says so
-  doc?.addEventListener("pointermove", (e) => by === "pointer" && (e as PointerEvent).buttons === 0 && release(), true);
-  doc?.addEventListener("keyup", (e) => by === "key" && (e as KeyboardEvent).key === " " && release(), true);
+  root.addEventListener("focusout", () => {
+    if (!h.key) return;
+    h.key = false;
+    if (!h.pointers.size) letGo(h);
+  });
+  if (root.ownerDocument) listen(root.ownerDocument);
   return () => {
-    if (by) missed = true;
-    else run();
+    if (holding.has(h)) h.missed = true;
+    else run(h);
   };
 }
 

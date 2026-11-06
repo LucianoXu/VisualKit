@@ -76,7 +76,8 @@ A part draws its region from the page's state, as an HTML string:
   click is a press and a release on the same element, so a button replaced between the two gets no
   click. The function it returns draws at once, or, while a pointer is pressed in `root` (or Space
   held on a control there), once the press ends and after its click:
-  `const drawSide = holdPress(body, () => keepFocus(body, () => { body.innerHTML = … }))`.
+  `const drawSide = holdPress(body, () => keepFocus(body, () => { body.innerHTML = … }))`. A hold
+  never lasts more than a second past the press's last event, nor past the page losing the focus.
 - One listener per region, delegated (`closest("[data-act]")`), registered once when the part is
   made, never re-registered on redraw.
 
