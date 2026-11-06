@@ -34,8 +34,9 @@ export interface PlayerState {
   speed?: number;
 }
 
-/** m:ss, or h:mm:ss from an hour */
+/** m:ss, or h:mm:ss from an hour; –:–– for what is not a time (NaN, Infinity) */
 export function clock(s: number): string {
+  if (!Number.isFinite(s)) return "–:––";
   const t = Math.max(0, Math.floor(s));
   const h = Math.floor(t / 3600), m = Math.floor((t % 3600) / 60), ss = String(t % 60).padStart(2, "0");
   return h ? `${h}:${String(m).padStart(2, "0")}:${ss}` : `${m}:${ss}`;
@@ -85,8 +86,8 @@ export class Player {
       const b = (e.target as Element).closest<HTMLElement>("[data-speed]");
       if (!b || !o.speeds) return;
       const v = Number(b.dataset.speed);
-      // on a phone only the speed in force shows (css): a press on it goes to the next
-      const alone = typeof matchMedia === "function" && matchMedia("(max-width: 700px)").matches;
+      // in a narrow strip only the speed in force shows (css): a press on it goes to the next
+      const alone = ![...this.el.querySelectorAll<HTMLElement>("[data-speed]")].some((x) => x !== b && x.getClientRects().length);
       o.speed?.(alone && v === this.last?.speed ? o.speeds[(o.speeds.indexOf(v) + 1) % o.speeds.length] : v);
     });
   }

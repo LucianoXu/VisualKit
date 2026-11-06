@@ -27,20 +27,33 @@ const H = 32;
 /** room above the top and under the bottom for the stroke and the dot */
 const PAD = 2;
 
-/** A number, or 0: what is not a finite number never reaches the markup. */
-const num = (v: unknown): number => (typeof v === "number" && Number.isFinite(v) ? v : 0);
 const f = (x: number): string => x.toFixed(2);
+/** a number given in an option, or none */
+const given = (v: unknown): number | null => (typeof v === "number" && Number.isFinite(v) ? v : null);
 
-/** `values` (oldest first) as an SVG sparkline. */
+/** `values` (oldest first) as an SVG sparkline; what is not a finite number is left out. */
 export function sparkline(values: readonly number[], o: SparkOptions = {}): SafeHtml {
-  const vs = values.map(num);
+  const vs: number[] = [];
+  for (const v of values) if (typeof v === "number" && Number.isFinite(v)) vs.push(v);
   const open = `<svg class="vk-spark" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true" focusable="false">`;
   if (!vs.length) return new SafeHtml(`${open}</svg>`);
-  const t = o.threshold === undefined ? null : num(o.threshold);
-  const lo = o.min === undefined ? Math.min(0, ...vs) : num(o.min);
-  let hi = o.max === undefined ? Math.max(...vs, t ?? -Infinity) : num(o.max);
+  // a loop, not Math.min(...vs): a long series would overflow the call's arguments
+  let least = 0, most = -Infinity;
+  for (const v of vs) {
+    if (v < least) least = v;
+    if (v > most) most = v;
+  }
+  const t = o.threshold === undefined ? null : given(o.threshold);
+  if (t !== null && t > most) most = t;
+  const lo = given(o.min) ?? least;
+  let hi = given(o.max) ?? most;
   if (!(hi > lo)) hi = lo + 1;
-  const y = (v: number) => H - PAD - ((Math.min(hi, Math.max(lo, v)) - lo) / (hi - lo)) * (H - 2 * PAD);
+  // halved, so that a range wider than the largest number (-1e308 to 1e308) is still finite
+  const span = hi / 2 - lo / 2;
+  const y = (v: number) => {
+    const at = (Math.min(hi, Math.max(lo, v)) / 2 - lo / 2) / span;
+    return H - PAD - (Number.isFinite(at) ? at : 0) * (H - 2 * PAD);
+  };
   // one value: a level line across
   const pts = vs.length === 1 ? [[0, y(vs[0])], [W, y(vs[0])]] : vs.map((v, i) => [(i / (vs.length - 1)) * W, y(v)]);
   const line = pts.map(([x, yy], i) => `${i ? "L" : "M"}${f(x)} ${f(yy)}`).join("");

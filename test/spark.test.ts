@@ -24,11 +24,19 @@ test("sparkline: no values draw nothing, one draws a level", () => {
   assert.match(String(sparkline([3])), /class="l" d="M0\.00 2\.00L100\.00 2\.00"/);
 });
 
-test("sparkline writes only digits from its values: what is not a finite number is 0", () => {
-  const bad = ["<script>", '"onload="x', NaN, Infinity, 2] as unknown as number[];
-  const s = String(sparkline(bad, { threshold: "<b>" as unknown as number }));
-  assert.doesNotMatch(s, /script|onload|NaN|Infinity|<b>/);
-  assert.match(s, /class="l" d="M0\.00 30\.00L25\.00 30\.00L50\.00 30\.00L75\.00 30\.00L100\.00 2\.00"/);
+test("sparkline writes only digits from its values: what is not a finite number is left out", () => {
+  const bad = ["<script>", '"onload="x', NaN, Infinity, 1, 2] as unknown as number[];
+  const s = String(sparkline(bad, { threshold: "<b>" as unknown as number, max: NaN }));
+  assert.doesNotMatch(s, /script|onload|NaN|Infinity|<b>|class="t"/);
+  assert.match(s, /class="l" d="M0\.00 16\.00L100\.00 2\.00"/);
+});
+
+test("sparkline: extreme ranges and long series draw finite paths", () => {
+  for (const vs of [[-1e308, 1e308], [Number.MAX_VALUE, -Number.MAX_VALUE, 0], [1e308, 1e308], [5e-324, 1e-323], Array.from({ length: 300_000 }, (_, i) => i % 7)]) {
+    const s = String(sparkline(vs, { threshold: 1e308 }));
+    assert.doesNotMatch(s, /NaN|Infinity/);
+    for (const [, d] of s.matchAll(/ d="([^"]*)"/g)) assert.match(d, /^[-MLHZh0-9. ]+$/);
+  }
 });
 
 test("clock writes m:ss, and h:mm:ss from an hour", () => {
@@ -36,6 +44,8 @@ test("clock writes m:ss, and h:mm:ss from an hour", () => {
   assert.equal(clock(75.9), "1:15");
   assert.equal(clock(3600 + 62), "1:01:02");
   assert.equal(clock(-3), "0:00");
+  assert.equal(clock(NaN), "–:––");
+  assert.equal(clock(Infinity), "–:––");
 });
 
 test("the player's icons are drawn like the others: strokes only", () => {

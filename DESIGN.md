@@ -41,11 +41,15 @@ the bar and side panel, 18px the drawer, a full pill for chips and collapsed win
 
 **The foot is the player's.** The side panel and the drawer stop at `--bottom`, leaving a 44px row
 (`--player-h`) under them: the player (`.vk-player`) is centred in it on what the panels leave of the
-content, and slides with the drawer. A legend corner keeps to the side panel's column under it, so
-the two never meet; on a phone, where the player takes the width, the corners rise over it.
+content, and slides with the drawer; never narrower than 360px, it reaches under the drawer where
+the panels leave less, and its parts give way by its own width. A legend corner keeps to the side
+panel's column under it, so the two never meet; where no side panel is shown (`data-side="none"`),
+and on a phone, the corner rises over it.
 
-**One order of layers** (`--z-*`): content, panels 6, strip 15, bar 20, windows 35, popovers 36,
-menu 38, modal 40, loader 50. A popover open in the bar lifts the bar with it (`:has`).
+**One order of layers** (`--z-*`): content; panels, the player and the corners 6 (a corner's card
+opened over the side panel lies over it by coming after it in the page); strip 15, bar 20, windows
+35, popovers 36, menu 38, modal 40, loader 50. A popover open in the bar lifts the bar with it
+(`:has`).
 
 ## Colour
 

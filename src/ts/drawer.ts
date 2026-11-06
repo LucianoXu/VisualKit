@@ -45,7 +45,9 @@ export class Drawer {
   }
 }
 
-/** Say on <html> how much of the viewport's width the side panel and an open drawer cover. */
+/** Say on <html> how much of the viewport's width the side panel and an open drawer cover
+ *  (`--inset-left`, `--inset-right`), and whether a side panel is shown (`data-side`: shown, none).
+ *  Call it when a panel comes or goes by other means than the Drawer. */
 export function insets(): void {
   const root = document.documentElement;
   const vw = root.clientWidth;
@@ -62,6 +64,8 @@ export function insets(): void {
     const r = parseFloat(style.right) || 0;
     if (style.top !== "auto" && w < vw) right = w + r;
   }
+  // whether a side panel is shown at all, for what would meet it (css/surfaces.css, the player)
+  root.dataset.side = left ? "shown" : "none";
   root.style.setProperty("--inset-left", `${Math.round(left)}px`);
   root.style.setProperty("--inset-right", `${Math.round(right)}px`);
 }
