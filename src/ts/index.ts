@@ -2,7 +2,8 @@
 export { $, $$, escapeHtml, html, raw, SafeHtml, fitBox, viewport, typing } from "./dom.ts";
 export { themeKey, themeHeadScript, themeChoice, themeShown, applyTheme, setTheme, holdTheme, onThemeChange, reducedMotion, token, themeChoices } from "./theme.ts";
 export type { ThemeChoice, ThemeShown } from "./theme.ts";
-export { keepFocus, holdFocus, focusKey, focusBack, firstControl, trapFocus } from "./focus.ts";
+export { keepFocus, holdFocus, holdPress, focusKey, focusBack, firstControl, trapFocus } from "./focus.ts";
+export type { PressRoot } from "./focus.ts";
 export { Popover, beside } from "./popover.ts";
 export type { PopoverOptions } from "./popover.ts";
 export { ContextMenu, contextMenuOn } from "./menu.ts";

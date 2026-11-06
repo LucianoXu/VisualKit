@@ -1,9 +1,10 @@
 // The drawer: the thing selected, told in full — its kind, its name in the gradient, its numbers,
-// what it uses, its note in light Markdown, and what can be done with it.
+// what it uses, its note in light Markdown, and what can be done with it. Drawn again on every live
+// tick: held while the reader presses in it (holdPress), its open sections kept on the page.
 //
 // A part of the page: demo/src/main.ts makes the parts in order, demo/src/page.ts says what they share.
 
-import { $, Drawer, html, icon, keepFocus, markdown, raw, confirm, ask } from "../../src/ts/index.ts";
+import { $, Drawer, html, holdPress, icon, keepFocus, markdown, raw, confirm, ask } from "../../src/ts/index.ts";
 import { KIND_COLOUR } from "./page.ts";
 import type { Page } from "./page.ts";
 
@@ -16,9 +17,8 @@ export function drawerPart(page: Page): DrawerPart {
   const el = $("#drawer");
   const drawer = new Drawer(el, { changed: (open) => !open && page.selected && page.select(null) });
 
-  const drawDrawer = () => {
+  const drawBody = holdPress(el, () => {
     const it = page.selected ? page.byId.get(page.selected) : null;
-    drawer.toggle(!!it);
     if (!it) return;
     const usedBy = page.items.filter((o) => o.uses.includes(it.id));
     keepFocus(el, () => {
@@ -40,9 +40,9 @@ export function drawerPart(page: Page): DrawerPart {
         <pre class="vk-code"><span class="tk-keyword">theorem</span> <span class="tk-type">${it.name}</span> : <span class="tk-type">Prop</span> := <span class="tk-keyword">by</span>
   <span class="tk-comment">-- ${it.uses.length} steps</span>
   exact <span class="tk-number">0</span></pre>
-        <div class="vk-sec"><button class="vk-sec-h" aria-expanded="true" data-sec="uses">Uses<span class="vk-sec-aside">${it.uses.length}</span></button>
+        <div class="vk-sec"><button class="vk-sec-h" aria-expanded="${page.unfolded.has("uses")}" data-sec="uses">Uses<span class="vk-sec-aside">${it.uses.length}</span></button>
           <div class="vk-sec-body">${it.uses.length ? it.uses.map((u) => html`<button class="vk-row" data-go="${u}"><span class="vk-row-l vk-mono">${u}</span></button>`) : html`<div class="vk-muted">Nothing.</div>`}</div></div>
-        <div class="vk-sec"><button class="vk-sec-h" aria-expanded="false" data-sec="diff">Changes<span class="vk-sec-aside">+1 −1</span></button>
+        <div class="vk-sec"><button class="vk-sec-h" aria-expanded="${page.unfolded.has("diff")}" data-sec="diff">Changes<span class="vk-sec-aside">+1 −1</span></button>
           <div class="vk-sec-body"><div class="vk-diff"><div class="del">  exact one</div><div class="add">  exact 0</div></div></div></div>
         <div class="vk-actions" style="justify-content:flex-start;margin-top:14px">
           <button class="vk-btn ok" data-act="approve">Approve</button>
@@ -51,12 +51,20 @@ export function drawerPart(page: Page): DrawerPart {
           <button class="vk-btn bad" data-act="remove">Remove</button>
         </div>`);
     });
+  });
+  const drawDrawer = () => {
+    drawer.toggle(!!page.selected);
+    drawBody();
   };
 
   el.addEventListener("click", async (e) => {
     const t = e.target as HTMLElement;
     const sec = t.closest<HTMLElement>("[data-sec]");
-    if (sec) return sec.setAttribute("aria-expanded", String(sec.getAttribute("aria-expanded") !== "true"));
+    if (sec) {
+      const s = sec.dataset.sec!;
+      if (!page.unfolded.delete(s)) page.unfolded.add(s);
+      return drawBody();
+    }
     const go = t.closest<HTMLElement>("[data-go]")?.dataset.go;
     if (go) return page.select(go);
     const act = t.closest<HTMLElement>("[data-act]")?.dataset.act;

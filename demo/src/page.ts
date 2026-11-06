@@ -11,6 +11,7 @@ import type { DrawerPart } from "./partdrawer.ts";
 import type { WindowsPart } from "./partwindows.ts";
 import type { MenuPart } from "./partmenu.ts";
 import type { LegendPart } from "./partlegend.ts";
+import type { LivePart } from "./partlive.ts";
 import type { KeysPart } from "./partkeys.ts";
 
 export type Kind = "definition" | "theorem" | "lemma" | "instance" | "axiom";
@@ -53,9 +54,13 @@ export interface PageState {
   /** the places gone to, for back and forward, and where in them the page is */
   history: (string | null)[];
   at: number;
+  /** the drawer's sections the reader has open, kept across its redraws */
+  unfolded: Set<string>;
+  /** how many ticks the live updates have made */
+  tick: number;
 }
 
-export interface Page extends PageGiven, PageState, CanvasPart, BarPart, StripPart, SidePart, DrawerPart, WindowsPart, MenuPart, LegendPart, KeysPart {}
+export interface Page extends PageGiven, PageState, CanvasPart, BarPart, StripPart, SidePart, DrawerPart, WindowsPart, MenuPart, LegendPart, LivePart, KeysPart {}
 
 /** What is lit with the selection, by the mode: the item itself, what it uses, or what uses it. */
 export function lit(page: Page): Set<string> {

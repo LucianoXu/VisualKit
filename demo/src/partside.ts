@@ -1,9 +1,10 @@
 // The side panel: the board as a tree, a folding section per group, a row per thing; the reader's
-// folds kept in this browser. Drawn from the page's state, the keyboard's place kept.
+// folds kept in this browser. Drawn from the page's state, the keyboard's place kept; drawn again on
+// every live tick, so held while the reader presses in it (holdPress).
 //
 // A part of the page: demo/src/main.ts makes the parts in order, demo/src/page.ts says what they share.
 
-import { $, html, keepFocus } from "../../src/ts/index.ts";
+import { $, html, holdPress, keepFocus } from "../../src/ts/index.ts";
 import { KIND_COLOUR, lit } from "./page.ts";
 import type { Page } from "./page.ts";
 
@@ -16,7 +17,7 @@ export function sidePart(page: Page): SidePart {
   $("#side-n").textContent = String(page.items.length);
   const groups = [...new Set(page.items.map((it) => it.group))];
 
-  const drawSide = () =>
+  const drawSide = holdPress(body, () =>
     keepFocus(body, () => {
       const folded = new Set(page.folded.get());
       const on = lit(page);
@@ -32,7 +33,8 @@ export function sidePart(page: Page): SidePart {
               <i></i><span class="vk-row-l">${it.name}</span>${it.status === "ok" ? "" : html`<span class="vk-dot ${it.status}" title="${it.status}"></span>`}</button>`,
           )}</div></div>`;
       })}`);
-    });
+    }),
+  );
 
   body.addEventListener("click", (e) => {
     const t = e.target as HTMLElement;

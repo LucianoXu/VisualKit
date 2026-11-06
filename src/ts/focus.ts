@@ -60,6 +60,54 @@ export function holdFocus(root: HTMLElement, fallback?: string): () => void {
   };
 }
 
+/** What `holdPress` listens on: an element and its document (in tests, stand-ins). */
+export interface PressRoot {
+  addEventListener(type: string, f: (e: Event) => void, capture?: boolean): void;
+  readonly ownerDocument: { addEventListener(type: string, f: (e: Event) => void, capture?: boolean): void } | null;
+}
+
+/** `draw` for a region drawn again by itself (a timer, live data): called while a press is in
+ *  progress in `root`, it waits, and draws once when the press ends. Otherwise it draws at once.
+ *
+ *    const drawSide = holdPress(body, () => keepFocus(body, () => { body.innerHTML = … }));
+ *
+ *  A click is a press and a release on the same element: a button replaced between the two gets
+ *  no click, and a region redrawn every second loses a click in ten. So a pointer pressed in
+ *  `root`, or Space held on a control in it (a button acts on Space's release), holds its draws.
+ *  The held draw runs after the release's click, and not at all if that click drew the region
+ *  itself. Enter acts on its press, so it holds nothing. */
+export function holdPress(root: PressRoot, draw: () => void): () => void {
+  let by: "pointer" | "key" | null = null;
+  let missed = false;
+  const run = () => {
+    missed = false;
+    draw();
+  };
+  const release = () => {
+    if (!by) return;
+    by = null;
+    // a task later: after the click the release brings, which may draw on its own
+    if (missed) setTimeout(() => missed && run(), 0);
+  };
+  root.addEventListener("pointerdown", () => (by = "pointer"));
+  root.addEventListener("keydown", (e) => {
+    if ((e as KeyboardEvent).key === " ") by = "key";
+  });
+  // the focus gone elsewhere with Space down: its release may never be heard here
+  root.addEventListener("focusout", () => by === "key" && release());
+  const doc = root.ownerDocument;
+  // released anywhere: the pointer may leave `root` before it lets go
+  doc?.addEventListener("pointerup", release, true);
+  doc?.addEventListener("pointercancel", release, true);
+  // let go outside the window, where no pointerup reaches the page: the next move says so
+  doc?.addEventListener("pointermove", (e) => by === "pointer" && (e as PointerEvent).buttons === 0 && release(), true);
+  doc?.addEventListener("keyup", (e) => by === "key" && (e as KeyboardEvent).key === " " && release(), true);
+  return () => {
+    if (by) missed = true;
+    else run();
+  };
+}
+
 /** `from` is closing with the focus in it: the focus goes to `to`. Elsewhere it is left be. */
 export function focusBack(from: HTMLElement, to: HTMLElement | null): void {
   if (typeof document === "undefined") return;

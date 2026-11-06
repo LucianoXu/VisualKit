@@ -72,6 +72,11 @@ A part draws its region from the page's state, as an HTML string:
   by its tag and data attributes and those of the row holding it. So give controls of redrawn
   regions data attributes that say what they are for (`data-id`, `data-act`) — they are also what
   the region's single delegated click handler reads.
+- **`holdPress(root, draw)`** is for a region drawn again by itself — on a timer, on live data. A
+  click is a press and a release on the same element, so a button replaced between the two gets no
+  click. The function it returns draws at once, or, while a pointer is pressed in `root` (or Space
+  held on a control there), once the press ends and after its click:
+  `const drawSide = holdPress(body, () => keepFocus(body, () => { body.innerHTML = … }))`.
 - One listener per region, delegated (`closest("[data-act]")`), registered once when the part is
   made, never re-registered on redraw.
 
